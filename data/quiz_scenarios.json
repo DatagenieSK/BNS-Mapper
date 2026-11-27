@@ -813,5 +813,140 @@
     "answer": "Fine which may extend to five thousand rupees",
     "correctIndex": 0,
     "explanation": "BNS Section 182 (formerly IPC Section 489E) penalizes making or using documents resembling currency notes or banknotes with a fine extending up to ₹5,000."
+  },
+  {
+    "id": "scen-ch11-01",
+    "section": "bns-189",
+    "chapter": "XI",
+    "scenario": "A group of six persons gathers outside a district collector's office carrying iron rods and stones with the declared common object of violently resisting the execution of a lawful court eviction order. What offence is constituted under BNS Section 189?",
+    "options": [
+      "Unlawful assembly armed with deadly weapons under BNS Section 189(3)",
+      "Simple affray under Section 194",
+      "Criminal conspiracy under Section 61",
+      "No offence until violence is actually used"
+    ],
+    "answer": "Unlawful assembly armed with deadly weapons under BNS Section 189(3)",
+    "correctIndex": 0,
+    "explanation": "An assembly of five or more persons with a common object to resist the execution of any law or legal process while armed with deadly weapons constitutes an unlawful assembly under BNS Section 189(3)."
+  },
+  {
+    "id": "scen-ch11-02",
+    "section": "bns-191",
+    "chapter": "XI",
+    "scenario": "During a protest, members of an unlawful assembly turn violent and start hurling petrol bombs at public buses. Under old IPC Section 148, rioting armed with a deadly weapon was punishable with up to 3 years imprisonment. What is the enhanced maximum sentence under BNS Section 191(3)?",
+    "options": [
+      "Imprisonment for a term which may extend to five years, or fine, or both",
+      "Imprisonment up to two years",
+      "Death penalty",
+      "Life imprisonment exclusively"
+    ],
+    "answer": "Imprisonment for a term which may extend to five years, or fine, or both",
+    "correctIndex": 0,
+    "explanation": "Under BNS Section 191(3), whoever is guilty of rioting being armed with a deadly weapon shall be punished with imprisonment up to five years, or with fine, or with both (increased from 3 years under IPC 148)."
+  },
+  {
+    "id": "scen-ch11-03",
+    "section": "bns-194",
+    "chapter": "XI",
+    "scenario": "Two men get into a heated brawl inside a busy public bus station, throwing punches and causing panic among commuters, thereby disturbing the public peace. Which section of BNS penalizes this offence of affray?",
+    "options": [
+      "BNS Section 194 (Affray)",
+      "BNS Section 189 (Unlawful assembly)",
+      "BNS Section 115 (Simple hurt)",
+      "BNS Section 131 (Assault)"
+    ],
+    "answer": "BNS Section 194 (Affray)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 194 (consolidating IPC 159 and 160) punishes affray—where two or more persons disturb the public peace by fighting in a public place—with imprisonment up to 1 month or fine up to ₹1,000 or both."
+  },
+  {
+    "id": "scen-ch12-01",
+    "section": "bns-199",
+    "chapter": "XII",
+    "scenario": "A station house police officer refuses to register a First Information Report (FIR) when a woman approaches the police station to report a gang rape incident. What penal liability does the officer face under BNS Section 199?",
+    "options": [
+      "Rigorous imprisonment for not less than six months extending to two years, and fine",
+      "Departmental censure only with no criminal liability",
+      "Simple fine of ₹500",
+      "Suspension from duty for 1 month"
+    ],
+    "answer": "Rigorous imprisonment for not less than six months extending to two years, and fine",
+    "correctIndex": 0,
+    "explanation": "Under BNS Section 199 (formerly IPC Section 166A), a public servant who fails to record mandatory information in relation to sexual offences faces mandatory rigorous imprisonment of 6 months to 2 years and fine."
+  },
+  {
+    "id": "scen-ch12-02",
+    "section": "bns-200",
+    "chapter": "XII",
+    "scenario": "An acid attack victim with severe facial burns is brought to a private hospital emergency room. The hospital administrator refuses to admit her without an upfront cash deposit and police clearance. Which section of BNS punishes this refusal of medical treatment?",
+    "options": [
+      "BNS Section 200 (Punishment for non-treatment of victim)",
+      "BNS Section 124 (Acid attack)",
+      "BNS Section 198 (Disobeying law)",
+      "BNS Section 221 (Obstructing official)"
+    ],
+    "answer": "BNS Section 200 (Punishment for non-treatment of victim)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 200 (formerly IPC Section 166B) punishes any hospital in-charge (public or private) who fails to provide immediate free first-aid or medical treatment to acid attack or rape victims with imprisonment up to 1 year or fine or both."
+  },
+  {
+    "id": "scen-ch12-03",
+    "section": "bns-204",
+    "chapter": "XII",
+    "scenario": "A conman wears a fake police badge, sets up an unauthorized traffic checkpoint on a highway, stops commercial trucks, and issues bogus traffic violation slips to extract money. Under which section is he prosecuted for personating a public servant?",
+    "options": [
+      "BNS Section 204 (Personating a public servant)",
+      "BNS Section 168",
+      "BNS Section 132",
+      "BNS Section 226"
+    ],
+    "answer": "BNS Section 204 (Personating a public servant)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 204 (formerly IPC Section 170) punishes pretending to hold office as a public servant and doing an act under colour of such office with imprisonment up to two years, or fine, or both."
+  },
+  {
+    "id": "scen-ch13-01",
+    "section": "bns-226",
+    "chapter": "XIII",
+    "scenario": "During a municipal anti-encroachment drive against illegal commercial shops, a shopkeeper pours kerosene over himself and attempts self-immolation to threaten and force the municipal enforcement officer to halt the demolition. Which newly introduced section of BNS explicitly penalizes this conduct?",
+    "options": [
+      "BNS Section 226 (Attempt to commit suicide to compel or restrain exercise of lawful power)",
+      "BNS Section 108 (Abetment of suicide)",
+      "BNS Section 221 (Obstructing public servant)",
+      "BNS Section 189 (Unlawful assembly)"
+    ],
+    "answer": "BNS Section 226 (Attempt to commit suicide to compel or restrain exercise of lawful power)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 226 is a brand-new provision specifically criminalizing attempts to commit suicide with intent to compel or restrain any public servant from exercising lawful power, punishable with imprisonment up to 1 year, fine, or community service."
+  },
+  {
+    "id": "scen-ch13-02",
+    "section": "bns-209",
+    "chapter": "XIII",
+    "scenario": "A magistrate issues and publishes a proclamation under Section 84 of the BNSS requiring an accused charged with armed robbery to appear on a fixed date. The accused intentionally absconds and fails to appear. Under which BNS section is this failure to appear penalized?",
+    "options": [
+      "BNS Section 209 (Non-appearance in response to proclamation under section 84 of BNSS)",
+      "BNS Section 206",
+      "BNS Section 208",
+      "BNS Section 223"
+    ],
+    "answer": "BNS Section 209 (Non-appearance in response to proclamation under section 84 of BNSS)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 209 (formerly IPC Section 174A) penalizes non-appearance in response to a proclamation published under Section 84 of the Bharatiya Nagarik Suraksha Sanhita, 2023 with imprisonment up to 3 years (or 7 years for proclaimed offenders)."
+  },
+  {
+    "id": "scen-ch13-03",
+    "section": "bns-223",
+    "chapter": "XIII",
+    "scenario": "To prevent communal clashes, a District Magistrate promulgates a curfew and assembly restriction order under law. A resident knowingly organizes a public street procession violating the order, leading to a riot. Which BNS section replaces IPC Section 188 for disobeying this promulgated order?",
+    "options": [
+      "BNS Section 223 (Disobedience to order duly promulgated by public servant)",
+      "BNS Section 188 (Repealed)",
+      "BNS Section 217",
+      "BNS Section 225"
+    ],
+    "answer": "BNS Section 223 (Disobedience to order duly promulgated by public servant)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 223 replaces old IPC Section 188, punishing disobedience to orders promulgated by a public servant where it causes danger to human life or rioting with imprisonment up to 6 months or fine up to ₹5,000 or both."
   }
 ]
