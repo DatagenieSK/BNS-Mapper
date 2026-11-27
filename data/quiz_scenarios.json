@@ -543,5 +543,95 @@
     "answer": "BNS Section 95 (Hiring, employing or engaging a child to commit an offence)",
     "correctIndex": 0,
     "explanation": "BNS Section 95 is a brand-new offence specifically penalizing anyone who hires, employs, or engages a child to commit crimes or in sexual exploitation/child pornography, prescribing 3 to 10 years imprisonment, fine, and liability as if the adult committed the crime personally."
+  },
+  {
+    "id": "scen-ch6-01",
+    "section": "bns-103",
+    "chapter": "VI",
+    "scenario": "Which section of the Bharatiya Nyaya Sanhita, 2023 replaces IPC Section 302 for the punishment of murder?",
+    "options": [
+      "BNS Section 103(1)",
+      "BNS Section 302",
+      "BNS Section 100",
+      "BNS Section 105"
+    ],
+    "answer": "BNS Section 103(1)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 103(1) replaces Section 302 of the IPC, prescribing death or imprisonment for life and fine for murder."
+  },
+  {
+    "id": "scen-ch6-02",
+    "section": "bns-103",
+    "chapter": "VI",
+    "scenario": "A mob of seven persons acting in concert intercepts a truck driver and lynches him to death purely on the ground of his religion and caste. Under which newly introduced statutory provision of the BNS is each member of such a group liable to capital punishment or imprisonment for life?",
+    "options": [
+      "BNS Section 103(2) (Murder by a group of five or more persons on discriminatory grounds)",
+      "BNS Section 106",
+      "BNS Section 115",
+      "BNS Section 126"
+    ],
+    "answer": "BNS Section 103(2) (Murder by a group of five or more persons on discriminatory grounds)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 103(2) is a historic addition specifically punishing mob lynching or group murder by five or more persons on grounds of race, caste, community, sex, place of birth, or personal belief with death or life imprisonment."
+  },
+  {
+    "id": "scen-ch6-03",
+    "section": "bns-106",
+    "chapter": "VI",
+    "scenario": "A driver speeds through an intersection, hits a pedestrian causing fatal injuries, and flees the scene immediately without reporting the incident to any police officer or magistrate. Under BNS Section 106(2), what is the maximum prison sentence for this 'hit-and-run' offence?",
+    "options": [
+      "Imprisonment for a term which may extend to 10 years, and fine",
+      "Imprisonment for 2 years, or fine, or both",
+      "Imprisonment for 5 years and fine",
+      "Community service for 6 months"
+    ],
+    "answer": "Imprisonment for a term which may extend to 10 years, and fine",
+    "correctIndex": 0,
+    "explanation": "Under BNS Section 106(2), causing death by rash and negligent driving and escaping without reporting soon after the incident carries a severe penalty of imprisonment up to 10 years and fine."
+  },
+  {
+    "id": "scen-ch6-04",
+    "section": "bns-116",
+    "chapter": "VI",
+    "scenario": "An assaulted victim suffers severe body blows and is admitted to hospital under acute pain, unable to follow his ordinary pursuits for 16 days. Under the old IPC Section 320, the threshold for grievous hurt was 20 days. Does this injury qualify as grievous hurt under BNS Section 116?",
+    "options": [
+      "Yes, because BNS Section 116(h) reduced the threshold of severe bodily pain or inability to follow ordinary pursuits from 20 days to 15 days",
+      "No, the threshold remains 20 days under BNS",
+      "No, hospital admission must exceed 30 days",
+      "Yes, but only if bone fracture is also proven"
+    ],
+    "answer": "Yes, because BNS Section 116(h) reduced the threshold of severe bodily pain or inability to follow ordinary pursuits from 20 days to 15 days",
+    "correctIndex": 0,
+    "explanation": "In BNS Section 116 (replacing IPC 320), the duration requirement under the eighth clause of grievous hurt was reduced from twenty days to fifteen days."
+  },
+  {
+    "id": "scen-ch6-05",
+    "section": "bns-111",
+    "chapter": "VI",
+    "scenario": "A member of an organised crime syndicate coordinates contract killings, illegal extortion networks, and cyber fraud. If a contract killing executed by the syndicate causes the death of a target, what is the mandatory punishment under newly enacted BNS Section 111(2)(a)?",
+    "options": [
+      "Death or imprisonment for life, and a fine which shall not be less than ₹10,00,000",
+      "Imprisonment for 7 years and fine of ₹50,000",
+      "Life imprisonment without any fine",
+      "Community service for 3 years"
+    ],
+    "answer": "Death or imprisonment for life, and a fine which shall not be less than ₹10,00,000",
+    "correctIndex": 0,
+    "explanation": "Under BNS Section 111(2)(a), if an organised crime offence results in the death of any person, the perpetrator shall be punished with death or imprisonment for life, and a mandatory fine of not less than ten lakh rupees."
+  },
+  {
+    "id": "scen-ch6-06",
+    "section": "bns-104",
+    "chapter": "VI",
+    "scenario": "Under old IPC Section 303, a life-convict committing murder received a mandatory death sentence, which the Supreme Court declared unconstitutional in Mithu v. State of Punjab. How has BNS Section 104 resolved this constitutional flaw?",
+    "options": [
+      "By providing judicial discretion between death OR imprisonment for the remainder of natural life, along with fine",
+      "By abolishing the offence completely",
+      "By reducing the penalty to simple imprisonment of 3 years",
+      "By exempting life convicts from new murder charges"
+    ],
+    "answer": "By providing judicial discretion between death OR imprisonment for the remainder of natural life, along with fine",
+    "correctIndex": 0,
+    "explanation": "BNS Section 104 cures the unconstitutional mandatory death sentence of IPC 303 by granting judges the discretion to award either capital punishment or imprisonment for the remainder of natural life."
   }
 ]
