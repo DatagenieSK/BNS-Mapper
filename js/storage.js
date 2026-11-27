@@ -297,7 +297,7 @@ export const storage = {
     }
 
     // Track chapter accuracy
-    if (chapter && chapter !== 'All Chapters') {
+    if (chapter && chapter !== 'All Chapters' && chapter !== 'all') {
       if (!stats.chapterStats[chapter]) {
         stats.chapterStats[chapter] = { correct: 0, total: 0 };
       }
@@ -328,5 +328,19 @@ export const storage = {
     } catch (e) {}
 
     return stats;
+  },
+
+  recordQuestionAnswer(chapter, isCorrect) {
+    if (!chapter || chapter === 'all' || chapter === 'All Chapters' || chapter === 'Omitted') return;
+    const stats = this.getQuizStats();
+    if (!stats.chapterStats) stats.chapterStats = {};
+    if (!stats.chapterStats[chapter]) {
+      stats.chapterStats[chapter] = { correct: 0, total: 0 };
+    }
+    stats.chapterStats[chapter].total += 1;
+    if (isCorrect) stats.chapterStats[chapter].correct += 1;
+    try {
+      localStorage.setItem(STORAGE_KEYS.QUIZ_STATS, JSON.stringify(stats));
+    } catch (e) {}
   }
 };

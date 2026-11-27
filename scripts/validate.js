@@ -1,7 +1,8 @@
 /**
  * Validation script for BNS Mapper chapter datasets & quiz scenarios
  * Checks all chapter files against data/schema.json, validates range constraints,
- * checks for duplicate IDs, and validates quiz scenarios.
+ * checks for duplicate IDs, verifies complete coverage of sections 1 to 358,
+ * and validates quiz scenarios & omitted IPC provisions.
  * Run with: node scripts/validate.js
  */
 
@@ -12,6 +13,7 @@ const schemaPath = path.join(__dirname, '..', 'data', 'schema.json');
 const chaptersIndexPath = path.join(__dirname, '..', 'data', 'chapters.json');
 const chaptersDir = path.join(__dirname, '..', 'data', 'chapters');
 const scenariosPath = path.join(__dirname, '..', 'data', 'quiz_scenarios.json');
+const omittedPath = path.join(__dirname, '..', 'data', 'omitted_ipc.json');
 
 function validate() {
   console.log('--- Validating BNS Mapper Chapter Datasets & Range Boundaries ---');
@@ -48,13 +50,15 @@ function validate() {
   ];
 
   const seenIds = new Set();
+  const bnsSectionCounts = new Map();
   let totalSections = 0;
 
   // Validate each chapter file in chapters.json
   for (const chMeta of chaptersIndex) {
     const chFile = path.join(chaptersDir, chMeta.file);
     if (!fs.existsSync(chFile)) {
-      // If round has not added this chapter yet, report as pending
+      console.error(`Missing expected chapter file: ${chMeta.file}`);
+      totalErrors++;
       continue;
     }
 
@@ -98,6 +102,7 @@ function validate() {
         console.error(`${label}: 'bns' must be a non-empty array of strings`);
         totalErrors++;
       }
+
       if (!Array.isArray(entry.ipc) || entry.ipc.length === 0) {
         console.error(`${label}: 'ipc' must be a non-empty array of strings`);
         totalErrors++;
@@ -115,7 +120,7 @@ function validate() {
         totalErrors++;
       }
 
-      // Check BNS section range boundary!
+      // Check BNS section range boundary & count for 1-358 coverage
       if (Array.isArray(entry.bns)) {
         entry.bns.forEach(secNumStr => {
           if (secNumStr === 'Omitted') return;
@@ -124,9 +129,13 @@ function validate() {
           if (isNaN(baseNum)) {
             console.error(`${label}: Cannot parse section number from '${secNumStr}'`);
             totalErrors++;
-          } else if (baseNum < chMeta.start || baseNum > chMeta.end) {
-            console.error(`${label}: Section number '${secNumStr}' (${baseNum}) is outside Chapter ${chMeta.chapter} range [${chMeta.start}-${chMeta.end}]`);
-            totalErrors++;
+          } else {
+            if (baseNum < chMeta.start || baseNum > chMeta.end) {
+              console.error(`${label}: Section number '${secNumStr}' (${baseNum}) is outside Chapter ${chMeta.chapter} range [${chMeta.start}-${chMeta.end}]`);
+              totalErrors++;
+            }
+            const count = bnsSectionCounts.get(baseNum) || 0;
+            bnsSectionCounts.set(baseNum, count + 1);
           }
         });
       }
@@ -134,6 +143,34 @@ function validate() {
 
     console.log(`✔ Chapter ${chMeta.chapter} (${chMeta.title}): ${list.length} sections validated [Range: ${chMeta.range}].`);
     totalSections += list.length;
+  }
+
+  // --- Strict Verification of Sections 1 to 358 Coverage ---
+  console.log('\n--- Verifying Exact Coverage of Sections 1 to 358 ---');
+  const missingSections = [];
+  const duplicateSections = [];
+
+  for (let s = 1; s <= 358; s++) {
+    const count = bnsSectionCounts.get(s) || 0;
+    if (count === 0) {
+      missingSections.push(s);
+    } else if (count > 1) {
+      duplicateSections.push({ section: s, count });
+    }
+  }
+
+  if (missingSections.length > 0) {
+    console.error(`✖ Missing ${missingSections.length} BNS section(s) between 1 and 358: ${missingSections.join(', ')}`);
+    totalErrors += missingSections.length;
+  } else {
+    console.log(`✔ Full Coverage: All 358 BNS sections (1 to 358) are accounted for.`);
+  }
+
+  if (duplicateSections.length > 0) {
+    console.error(`✖ Duplicate BNS section(s) detected:`, duplicateSections);
+    totalErrors += duplicateSections.length;
+  } else {
+    console.log(`✔ Exact Uniqueness: Every section from 1 to 358 is present exactly once.`);
   }
 
   // Validate Quiz Scenarios
@@ -147,7 +184,6 @@ function validate() {
     }
 
     if (Array.isArray(scenarios)) {
-      const scenIds = new Set();
       scenarios.forEach((sc, idx) => {
         const label = `Scenario #${idx + 1} (${sc.id || sc.section || 'no-id'})`;
         if (!sc.scenario || typeof sc.scenario !== 'string') {
@@ -167,12 +203,33 @@ function validate() {
     }
   }
 
+  // Validate Omitted IPC entries
+  if (fs.existsSync(omittedPath)) {
+    let omitted;
+    try {
+      omitted = JSON.parse(fs.readFileSync(omittedPath, 'utf8'));
+    } catch (e) {
+      console.error(`Error parsing omitted_ipc.json: ${e.message}`);
+      totalErrors++;
+    }
+    if (Array.isArray(omitted)) {
+      omitted.forEach((om, idx) => {
+        const label = `Omitted IPC #${idx + 1} (${om.ipc || 'no-ipc'})`;
+        if (!om.ipc || !om.title || !om.reason) {
+          console.error(`${label}: Missing required fields ('ipc', 'title', 'reason')`);
+          totalErrors++;
+        }
+      });
+      console.log(`✔ Omitted IPC Provisions: ${omitted.length} provisions validated.`);
+    }
+  }
+
   if (totalErrors > 0) {
     console.error(`\nValidation failed with ${totalErrors} error(s).`);
     process.exit(1);
   }
 
-  console.log(`\n\x1b[32m✔ All chapter datasets passed validation cleanly! Total sections: ${totalSections}\x1b[0m`);
+  console.log(`\n\x1b[32m✔ All chapter datasets passed validation cleanly! Total sections: ${totalSections} / 358\x1b[0m`);
 }
 
 validate();

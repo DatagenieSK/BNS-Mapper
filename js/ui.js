@@ -62,6 +62,7 @@ export const ui = {
     const list = Array.isArray(arr) ? arr : [arr];
     if (list.length === 0 || (list.length === 1 && list[0] === 'None')) return `None (New)`;
     if (list.length === 1 && list[0] === 'Omitted') return `Omitted`;
+    if (list.length === 1 && list[0] === 'No direct BNS equivalent') return `No direct BNS equivalent`;
 
     const joined = list.map(num => `§ ${num}`).join(' + ');
     return prefix ? `${prefix} ${joined}` : joined;
@@ -319,6 +320,49 @@ export const ui = {
 
     // Format chapter display
     const chLabel = item.chapter ? `Chapter ${item.chapter}` : '';
+
+    if (item.isOmittedIpc || (Array.isArray(item.bns) && item.bns.includes('No direct BNS equivalent'))) {
+      return `
+        <article class="section-card" data-section-id="${item.id}" style="border-left: 4px solid #C62828;">
+          <div class="card-top">
+            <div class="mapping-numbers">
+              <span class="number-primary">${formattedIpc}</span>
+              <span class="mapping-arrow">&rarr;</span>
+              <span class="number-secondary" style="color: #C62828; font-size: 0.85rem; font-weight: 700;">No direct BNS equivalent</span>
+            </div>
+            <div class="card-actions">
+              <button
+                class="card-action-icon bookmark-btn ${isBookmarked ? 'active' : ''}"
+                data-bookmark-id="${item.id}"
+                title="${isBookmarked ? 'Remove bookmark' : 'Bookmark section'}"
+                aria-label="Bookmark section ${item.title}"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="${isBookmarked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 8px;">
+            <span class="badge badge-omitted">No direct BNS equivalent</span>
+          </div>
+
+          <h3 class="card-title">
+            <a href="#/section/${item.id}">${highlightedTitle}</a>
+          </h3>
+
+          <p class="card-explanation">${highlightedExplanation}</p>
+
+          <div class="card-footer">
+            <span class="card-chapter-tag" title="IPC Provision Dropped or Subsumed">Omitted in BNS</span>
+            <a href="#/section/${item.id}" class="card-read-more" aria-label="View Omission Note">
+              Omission Note &rarr;
+            </a>
+          </div>
+        </article>
+      `;
+    }
 
     return `
       <article class="section-card" data-section-id="${item.id}">
@@ -1005,6 +1049,11 @@ export const ui = {
             <div class="section-label" style="margin-bottom: 8px;">Recent Session Accuracy (%)</div>
             ${this.renderHistorySvgChart(stats.history)}
           </div>
+
+          <div class="chart-container" style="margin-top: 24px;">
+            <div class="section-label" style="margin-bottom: 12px;">Weak Chapters &amp; Focused Revision</div>
+            ${this.renderWeakChaptersDashboard(stats, allChapters)}
+          </div>
         </section>
       </section>
     `;
@@ -1075,6 +1124,91 @@ export const ui = {
           </text>
         `).join('')}
       </svg>
+    `;
+  },
+
+  renderWeakChaptersDashboard(stats, allChapters) {
+    const chapterStats = stats.chapterStats || {};
+    const attempted = [];
+
+    for (const ch of (allChapters || [])) {
+      if (!ch || ch === 'Omitted') continue;
+      const cs = chapterStats[ch];
+      if (cs && cs.total > 0) {
+        const acc = Math.round((cs.correct / cs.total) * 100);
+        attempted.push({
+          chapter: ch,
+          accuracy: acc,
+          correct: cs.correct,
+          total: cs.total
+        });
+      }
+    }
+
+    if (attempted.length > 0) {
+      // Sort by lowest accuracy first (weakest first)
+      attempted.sort((a, b) => a.accuracy - b.accuracy);
+      const weakest = attempted.filter(a => a.accuracy < 75);
+
+      return `
+        <div style="margin-bottom: 8px;">
+          ${weakest.length > 0 ? `
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: #C62828; font-weight: 600; font-size: 0.95rem;">
+              <span>⚠️ Need Attention: ${weakest.length} ${weakest.length === 1 ? 'Chapter has' : 'Chapters have'} accuracy below 75%</span>
+            </div>
+          ` : `
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: #19682C; font-weight: 600; font-size: 0.95rem;">
+              <span>✔ Strong Performance across all attempted chapters!</span>
+            </div>
+          `}
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+            ${attempted.map(item => `
+              <div class="punishment-box" style="padding: 12px 16px; border-left: 4px solid ${item.accuracy < 60 ? '#C62828' : (item.accuracy < 80 ? '#D97706' : '#19682C')};">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <strong style="font-size: 1rem;">Chapter ${item.chapter}</strong>
+                  <span class="badge ${item.accuracy < 60 ? 'badge-omitted' : (item.accuracy < 80 ? 'badge-modified' : 'badge-renumbered')}">
+                    ${item.accuracy}% (${item.correct}/${item.total})
+                  </span>
+                </div>
+                <div class="quiz-progress-track" style="height: 6px; margin: 8px 0;">
+                  <div class="quiz-progress-fill" style="width: ${item.accuracy}%; background: ${item.accuracy < 60 ? '#C62828' : (item.accuracy < 80 ? '#D97706' : '#19682C')};"></div>
+                </div>
+                <a href="#/quiz?mode=mixed&chapter=${item.chapter}&diff=medium" class="btn btn-outline" style="width: 100%; text-align: center; padding: 4px 10px; font-size: 0.8rem; margin-top: 6px;">
+                  Practice Chapter ${item.chapter} &rarr;
+                </a>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // Default suggestions when user hasn't attempted specific chapters yet
+    const recommendedChapters = [
+      { ch: 'VI', title: 'Offences Affecting Human Body (ss. 100-146)', desc: 'High traffic: Culpable homicide, murder, mob lynching, grievous hurt' },
+      { ch: 'XVII', title: 'Offences Against Property (ss. 303-334)', desc: 'High traffic: Theft, new snatching offence, extortion, robbery, cheating' },
+      { ch: 'V', title: 'Offences Against Woman & Child (ss. 63-99)', desc: 'Crucial changes: Deceitful marriage promise, gang rape minors, child hiring' },
+      { ch: 'XIV', title: 'Public Justice & False Evidence (ss. 227-269)', desc: 'Fabricating evidence, witness intimidation, harbouring, custody escape' }
+    ];
+
+    return `
+      <div>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">
+          Practice chapter-specific quizzes above to unlock detailed diagnostic accuracy metrics. Recommended high-yield focus chapters for judicial exams:
+        </p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px;">
+          ${recommendedChapters.map(r => `
+            <div class="punishment-box" style="padding: 12px 16px; border-left: 4px solid var(--accent);">
+              <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 2px;">Chapter ${r.ch}</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">${r.title}</div>
+              <p style="font-size: 0.8rem; margin-bottom: 10px; line-height: 1.4;">${r.desc}</p>
+              <a href="#/quiz?mode=mixed&chapter=${r.ch}&diff=medium" class="btn btn-outline" style="width: 100%; text-align: center; padding: 4px 10px; font-size: 0.8rem;">
+                Target Chapter ${r.ch} &rarr;
+              </a>
+            </div>
+          `).join('')}
+        </div>
+      </div>
     `;
   },
 
@@ -1161,6 +1295,12 @@ export const ui = {
     const isCorrect = selectedIdx === question.correctIndex;
     if (isCorrect) session.score++;
 
+    session.answers.push({
+      questionIndex: session.currentIndex,
+      selectedIndex: selectedIdx,
+      isCorrect
+    });
+
     document.querySelectorAll('.quiz-option-btn').forEach((b, i) => {
       b.disabled = true;
       if (i === question.correctIndex) {
@@ -1217,6 +1357,15 @@ export const ui = {
       mode: session.mode,
       chapter: session.chapter
     });
+
+    if (session.answers && session.answers.length > 0) {
+      session.answers.forEach(a => {
+        const q = session.questions[a.questionIndex];
+        if (q && q.chapter) {
+          storage.recordQuestionAnswer(q.chapter, a.isCorrect);
+        }
+      });
+    }
 
     container.innerHTML = `
       <div class="question-card" style="text-align: center; padding: 40px 20px;">
@@ -1466,66 +1615,252 @@ export const ui = {
   renderWhatsNew() {
     document.title = "What's New in Bharatiya Nyaya Sanhita — BNS Mapper";
 
+    const allCombined = searchEngine.getAllSectionsCombined();
+    // Rebuild automatically from every entry with change = "new"
+    const newSections = allCombined.filter(s => s.change === 'new');
+
     this.appContainer.innerHTML = `
       <section class="detail-view" aria-labelledby="whats-new-title">
         <div style="margin-bottom: 24px;">
-          <h2 id="whats-new-title" style="font-size: 2.2rem; margin-bottom: 8px;">What's New in the Sanhitas?</h2>
-          <p>Key statutory innovations, brand-new criminal offences, and reformative sentencing models introduced in 2023.</p>
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
+            <h2 id="whats-new-title" style="font-size: 2.2rem; margin: 0;">What's New in Bharatiya Nyaya Sanhita, 2023</h2>
+            <span class="badge badge-new" style="font-size: 0.9rem; padding: 6px 14px;">
+              ${newSections.length} Brand-New Statutory Provisions
+            </span>
+          </div>
+          <p style="font-size: 1.05rem; color: var(--text-secondary); max-width: 820px; line-height: 1.6;">
+            The Bharatiya Nyaya Sanhita, 2023 codified unprecedented statutory offences with no direct IPC predecessor, modernizing criminal law for contemporary society. Below are all <strong>${newSections.length} codified provisions marked as brand-new</strong>, generated directly from the Sanhita dataset.
+          </p>
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 20px;">
-          <div class="detail-header-card">
-            <span class="badge badge-modified" style="margin-bottom: 12px;">Sentencing Reform &bull; Chapter II</span>
-            <h3 style="font-size: 1.4rem; margin-bottom: 8px;">
-              <a href="#/section/bns-4">Section 4 BNS &mdash; Community Service as Statutory Punishment</a>
-            </h3>
-            <p style="margin-bottom: 12px;">
-              For the first time in Indian statutory penal law, Community Service is established as an independent form of punishment under Section 4(f). It provides magistrates with non-custodial reformative alternatives for petty theft under ₹5,000, defamation, and public intoxication.
-            </p>
-          </div>
+          ${newSections.map(sec => `
+            <article class="detail-header-card" style="border-left: 4px solid var(--accent); transition: transform 0.2s ease;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                <div>
+                  <span class="badge badge-new" style="margin-right: 8px;">NEW OFFENCE</span>
+                  <span class="card-chapter-tag">${sec.chapter ? `Chapter ${sec.chapter}` : ''}</span>
+                </div>
+                <div style="font-family: var(--font-mono); font-weight: 700; color: var(--accent); font-size: 1.1rem;">
+                  ${this.formatSections(sec.bns, 'BNS')}
+                </div>
+              </div>
 
-          <div class="detail-header-card">
-            <span class="badge badge-merged" style="margin-bottom: 12px;">Cyber Jurisdiction &bull; Chapter I</span>
-            <h3 style="font-size: 1.4rem; margin-bottom: 8px;">
-              <a href="#/section/bns-1">Section 1(5)(c) BNS &mdash; Express Extraterritorial Cyber Jurisdiction</a>
-            </h3>
-            <p style="margin-bottom: 12px;">
-              Section 1 expressly incorporates extraterritorial jurisdiction over any individual, Indian or foreign national, who targets computer systems or resources situated in India from anywhere in the world.
-            </p>
-          </div>
+              <h3 style="font-size: 1.35rem; margin-bottom: 8px;">
+                <a href="#/section/${sec.id}" style="color: var(--text-primary); text-decoration: none;">
+                  ${this.escapeHtml(sec.title)} &rarr;
+                </a>
+              </h3>
 
-          <div class="detail-header-card">
-            <span class="badge badge-new" style="margin-bottom: 12px;">Street Crime &bull; Chapter XVII</span>
-            <h3 style="font-size: 1.4rem; margin-bottom: 8px;">
-              <a href="#/section/bns-304">Section 304 BNS &mdash; Snatching</a>
-            </h3>
-            <p style="margin-bottom: 12px;">
-              IPC had no dedicated offence for street snatching of phones, purses, and gold chains; police had to choose between simple theft or violent robbery. BNS 304 creates an express category for sudden/forcible seizing.
-            </p>
-          </div>
+              <div style="margin-bottom: 12px; font-size: 0.95rem; line-height: 1.5; color: var(--text-secondary);">
+                ${this.escapeHtml(sec.new_text)}
+              </div>
 
-          <div class="detail-header-card">
-            <span class="badge badge-new" style="margin-bottom: 12px;">Hate Crime &bull; Chapter VI</span>
-            <h3 style="font-size: 1.4rem; margin-bottom: 8px;">
-              <a href="#/section/bns-103-2">Section 103(2) BNS &mdash; Mob Lynching / Group Hate Murder</a>
-            </h3>
-            <p style="margin-bottom: 12px;">
-              Expressly codifies group murder committed by five or more persons on grounds of race, caste, community, sex, place of birth, language, or personal belief, prescribing death or life imprisonment.
-            </p>
-          </div>
+              <div style="background: var(--bg-subtle); padding: 12px 16px; border-radius: var(--radius-md); margin-bottom: 14px; font-size: 0.9rem;">
+                <strong style="color: var(--text-primary);">Prescribed Punishment:</strong>
+                <span style="color: var(--accent); font-weight: 600;">${this.escapeHtml(sec.punishment_new)}</span>
+              </div>
 
-          <div class="detail-header-card">
-            <span class="badge badge-new" style="margin-bottom: 12px;">Syndicate Crime &bull; Chapter VI</span>
-            <h3 style="font-size: 1.4rem; margin-bottom: 8px;">
-              <a href="#/section/bns-111">Section 111 BNS &mdash; Organised Crime</a>
-            </h3>
-            <p style="margin-bottom: 12px;">
-              Establishes a unified central penal code offence for criminal syndicates, contract killings, kidnapping rackets, and land grabbing, ending sole reliance on state laws like MCOCA.
-            </p>
-          </div>
+              <p style="font-size: 0.95rem; line-height: 1.5; margin-bottom: 14px; color: var(--text-primary);">
+                <strong>Why This Was Added:</strong> ${this.escapeHtml(sec.explanation)}
+              </p>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div class="tags-list">
+                  ${(sec.tags || []).map(t => `<span class="tag-chip">#${this.escapeHtml(t)}</span>`).join('')}
+                </div>
+                <a href="#/section/${sec.id}" class="btn btn-outline" style="font-size: 0.85rem; padding: 6px 14px;">
+                  View Provision Details &rarr;
+                </a>
+              </div>
+            </article>
+          `).join('')}
         </div>
       </section>
     `;
+    this.renderCompareTray();
+  },
+
+  // -------------------------------------------------------------
+  // View 8: BNS COVERAGE & VERIFICATION DASHBOARD
+  // -------------------------------------------------------------
+  renderCoverageView() {
+    document.title = "BNS Coverage & Gazette Verification Dashboard — BNS Mapper";
+
+    const allSections = searchEngine.getAllSections();
+    const chaptersIndex = this.chaptersIndex || [];
+
+    // Calculate total BNS sections from 1 to 358
+    const totalTarget = 358;
+    const bnsInDataset = allSections.filter(s => {
+      if (!s.bns || !Array.isArray(s.bns)) return false;
+      return s.bns.some(n => {
+        const num = parseInt(String(n).replace(/[^0-9]/g, ''), 10);
+        return !isNaN(num) && num >= 1 && num <= 358;
+      });
+    });
+
+    const totalPresent = bnsInDataset.length;
+    const verifiedCount = bnsInDataset.filter(s => s.verified === true).length;
+    const todoList = bnsInDataset.filter(s => {
+      const str = JSON.stringify(s);
+      return str.includes('TODO');
+    });
+    const todoCount = todoList.length;
+
+    const codifiedPct = Math.round((totalPresent / totalTarget) * 100);
+    const verifiedPct = Math.round((verifiedCount / totalTarget) * 100);
+
+    // Compute metrics per chapter
+    const chapterRows = chaptersIndex.map(ch => {
+      const chSecs = bnsInDataset.filter(s => s.chapter === ch.chapter);
+      const chVerified = chSecs.filter(s => s.verified === true).length;
+      const chTodos = chSecs.filter(s => JSON.stringify(s).includes('TODO')).length;
+      const targetSecs = ch.sections_count || (ch.end - ch.start + 1);
+      const presentCount = chSecs.length;
+      const chPct = Math.min(100, Math.round((presentCount / targetSecs) * 100));
+
+      return {
+        ...ch,
+        targetSecs,
+        presentCount,
+        verifiedCount: chVerified,
+        todoCount: chTodos,
+        pct: chPct
+      };
+    });
+
+    this.appContainer.innerHTML = `
+      <section class="detail-view" aria-labelledby="coverage-page-title">
+        <div style="margin-bottom: 24px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
+            <h2 id="coverage-page-title" style="font-size: 2.2rem; margin: 0;">BNS Codification &amp; Verification Dashboard</h2>
+            <span class="badge badge-modified" style="font-size: 0.9rem; padding: 6px 14px;">
+              All 20 Chapters Accounted For
+            </span>
+          </div>
+          <p style="font-size: 1.05rem; color: var(--text-secondary); max-width: 820px; line-height: 1.6;">
+            Real-time verification tracker monitoring all 358 sections of the Bharatiya Nyaya Sanhita, 2023 across Chapters I to XX against the official Gazette of India.
+          </p>
+        </div>
+
+        <!-- High Level Metrics Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; margin-bottom: 28px;">
+          <div class="punishment-box" style="border-top: 4px solid #19682C;">
+            <div class="punishment-tag">Total BNS Sections</div>
+            <div style="font-size: 2rem; font-weight: 700; color: #19682C; margin-top: 4px;">
+              ${totalPresent} / ${totalTarget}
+            </div>
+            <div style="font-size: 0.825rem; color: var(--text-muted); margin-top: 4px;">
+              ${codifiedPct}% codified in dataset
+            </div>
+          </div>
+
+          <div class="punishment-box" style="border-top: 4px solid var(--accent);">
+            <div class="punishment-tag">Chapters Complete</div>
+            <div style="font-size: 2rem; font-weight: 700; color: var(--accent); margin-top: 4px;">
+              ${chaptersIndex.length} / 20
+            </div>
+            <div style="font-size: 0.825rem; color: var(--text-muted); margin-top: 4px;">
+              100% chapter coverage (ss. 1–358)
+            </div>
+          </div>
+
+          <div class="punishment-box" style="border-top: 4px solid #D97706;">
+            <div class="punishment-tag">Verified by Gazette</div>
+            <div style="font-size: 2rem; font-weight: 700; color: #D97706; margin-top: 4px;">
+              ${verifiedCount} / ${totalTarget}
+            </div>
+            <div style="font-size: 0.825rem; color: var(--text-muted); margin-top: 4px;">
+              ${verifiedPct}% formally verified
+            </div>
+          </div>
+
+          <div class="punishment-box" style="border-top: 4px solid ${todoCount > 0 ? '#C62828' : '#2E7D32'};">
+            <div class="punishment-tag">Open TODOs</div>
+            <div style="font-size: 2rem; font-weight: 700; color: ${todoCount > 0 ? '#C62828' : '#2E7D32'}; margin-top: 4px;">
+              ${todoCount}
+            </div>
+            <div style="font-size: 0.825rem; color: var(--text-muted); margin-top: 4px;">
+              ${todoCount === 0 ? 'Clean dataset &mdash; zero open TODOs' : 'Provisions requiring resolution'}
+            </div>
+          </div>
+        </div>
+
+        <!-- Verification Workflow Banner -->
+        <div class="detail-header-card" style="background: var(--bg-subtle); border-left: 4px solid var(--accent); margin-bottom: 28px;">
+          <h3 style="font-size: 1.25rem; margin-bottom: 8px;">Community Gazette Verification Workflow</h3>
+          <p style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 12px;">
+            Law students and advocates: help verify provisions against the official Ministry of Law &amp; Justice Gazette (Act No. 45 of 2023). Pick any chapter below, check the operative summaries and punishment terms, and submit a pull request flipping <code>"verified": true</code>!
+          </p>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="https://github.com/DatagenieSK/BNS-Mapper/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener" class="btn btn-primary" style="font-size: 0.85rem;">
+              Read Verification Guide &rarr;
+            </a>
+            <a href="https://github.com/DatagenieSK/BNS-Mapper" target="_blank" rel="noopener" class="btn btn-outline" style="font-size: 0.85rem;">
+              View Repository on GitHub &nearr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Chapter-by-Chapter Coverage Breakdown -->
+        <div style="margin-bottom: 16px;">
+          <h3 style="font-size: 1.4rem; margin-bottom: 16px;">Chapter-by-Chapter Codification &amp; Verification Status</h3>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          ${chapterRows.map(ch => `
+            <div class="chapter-card" style="padding: 16px 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+                <div>
+                  <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
+                    Chapter ${ch.chapter} &bull; Sections ${ch.range}
+                  </div>
+                  <h4 style="font-size: 1.15rem; margin-top: 2px;">
+                    <a href="#/chapters" style="color: var(--text-primary); text-decoration: none;">
+                      ${this.escapeHtml(ch.title)}
+                    </a>
+                  </h4>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="badge ${ch.pct === 100 ? 'badge-renumbered' : 'badge-modified'}">
+                    ${ch.presentCount} / ${ch.targetSecs} sections (${ch.pct}%)
+                  </span>
+                  ${ch.verifiedCount > 0 ? `
+                    <span class="badge badge-renumbered" title="Verified against Gazette">
+                      ✔ ${ch.verifiedCount} Verified
+                    </span>
+                  ` : `
+                    <span class="badge badge-modified" title="Pending manual gazette review">
+                      Pending Verification
+                    </span>
+                  `}
+                  ${ch.todoCount > 0 ? `
+                    <span class="badge badge-omitted" title="Open TODO items">
+                      ${ch.todoCount} TODOs
+                    </span>
+                  ` : ''}
+                </div>
+              </div>
+
+              <!-- Animated Progress Bar -->
+              <div class="quiz-progress-track" style="height: 10px; margin-bottom: 8px;" title="${ch.pct}% Codified">
+                <div class="quiz-progress-fill" style="width: ${ch.pct}%; background: ${ch.pct === 100 ? '#19682C' : 'var(--accent)'}; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.825rem; color: var(--text-muted);">
+                <span>Dataset: <code>data/chapters/${ch.file}</code></span>
+                <a href="#/search?chapter=${ch.chapter}" class="card-read-more" style="font-size: 0.825rem;">
+                  Browse Chapter Sections &rarr;
+                </a>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </section>
+    `;
+
     this.renderCompareTray();
   },
 

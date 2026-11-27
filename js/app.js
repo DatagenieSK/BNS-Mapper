@@ -32,14 +32,15 @@ async function bootstrap() {
   // Fetch Chapters index and merge chapter files
   let ipcSections = [];
   let chaptersIndex = [];
-  let bnssSections = [], bsaSections = [], quizScenarios = [];
+  let bnssSections = [], bsaSections = [], quizScenarios = [], omittedIpc = [];
 
   try {
-    const [chaptersRes, bnssRes, bsaRes, scenRes] = await Promise.all([
+    const [chaptersRes, bnssRes, bsaRes, scenRes, omittedRes] = await Promise.all([
       fetch('./data/chapters.json'),
       fetch('./data/bnss_sections.json').catch(() => ({ ok: false })),
       fetch('./data/bsa_sections.json').catch(() => ({ ok: false })),
-      fetch('./data/quiz_scenarios.json').catch(() => ({ ok: false }))
+      fetch('./data/quiz_scenarios.json').catch(() => ({ ok: false })),
+      fetch('./data/omitted_ipc.json').catch(() => ({ ok: false }))
     ]);
 
     if (chaptersRes.ok) {
@@ -55,6 +56,28 @@ async function bootstrap() {
 
       const chapterResults = await Promise.all(chapterFetches);
       ipcSections = chapterResults.flat();
+    }
+
+    if (omittedRes.ok) {
+      const omittedRaw = await omittedRes.json();
+      const omittedFormatted = omittedRaw.map(om => ({
+        id: `omitted-ipc-${om.ipc.toLowerCase()}`,
+        ipc: [om.ipc],
+        bns: ['No direct BNS equivalent'],
+        title: om.title,
+        chapter: 'Omitted',
+        change: 'omitted',
+        old_text: `IPC Section ${om.ipc}: ${om.title}`,
+        new_text: 'No direct BNS equivalent in the Bharatiya Nyaya Sanhita, 2023.',
+        punishment_old: 'Previously punishable under Indian Penal Code',
+        punishment_new: om.status,
+        explanation: om.reason,
+        tags: om.tags || ['omitted'],
+        verified: false,
+        source: 'Official BNS Text & IPC Comparison Table',
+        isOmittedIpc: true
+      }));
+      ipcSections = [...ipcSections, ...omittedFormatted];
     }
 
     // Fallback if chapter files are not yet fully available
@@ -121,6 +144,9 @@ async function bootstrap() {
     })
     .addRoute('#/compare', () => {
       ui.renderCompareView();
+    })
+    .addRoute('#/coverage', () => {
+      ui.renderCoverageView();
     });
 
   bindGlobalControls();

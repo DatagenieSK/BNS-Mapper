@@ -1,0 +1,18 @@
+[
+  {
+    "id": "bns-358",
+    "bns": ["358"],
+    "ipc": ["Omitted"],
+    "title": "Repeal and savings",
+    "chapter": "XX",
+    "change": "new",
+    "old_text": "No direct equivalent; the Indian Penal Code, 1860 (Act 45 of 1860) had no self-repeal clause.",
+    "new_text": "Repeals the Indian Penal Code (45 of 1860), while saving prior operation, rights, liabilities, ongoing investigations, proceedings, and penalties.",
+    "punishment_old": "Not applicable",
+    "punishment_new": "Not applicable (Statutory repeal and savings provision)",
+    "explanation": "BNS Section 358 formally repeals the Indian Penal Code, 1860. The comprehensive savings clause ensures that offences committed prior to the commencement date remain investigable and triable under the substantive provisions of the IPC.",
+    "tags": ["repeal", "savings clause", "transition", "IPC repeal", "commencement"],
+    "verified": false,
+    "source": ""
+  }
+]

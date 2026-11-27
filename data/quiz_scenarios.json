@@ -1188,5 +1188,140 @@
     "answer": "House-trespass or house-breaking by night in order to commit theft",
     "correctIndex": 0,
     "explanation": "BNS Section 331 consolidates the complex 9 sections of IPC (449-458) into an aggravated hierarchy, specifically penalizing house-breaking by night to commit an offence with enhanced imprisonment up to 14 years and fine."
+  },
+  {
+    "id": "scen-ch18-01",
+    "section": "bns-338",
+    "chapter": "XVIII",
+    "scenario": "An estranged relative secretly fabricates a holographic will purportedly signed by an elderly deceased landowner to disinherit legitimate heirs and claim an ancestral farm. Under BNS Section 338 (formerly IPC Section 467), what is the maximum punishment for forgery of a will or valuable security?",
+    "options": [
+      "Imprisonment for life, or imprisonment up to 10 years, and fine",
+      "Imprisonment up to 2 years, or fine, or both",
+      "Imprisonment up to 5 years and fine",
+      "Community service for 6 months"
+    ],
+    "answer": "Imprisonment for life, or imprisonment up to 10 years, and fine",
+    "correctIndex": 0,
+    "explanation": "BNS Section 338 replaces IPC Section 467, treating forgery of wills, valuable securities, or adoption deeds as an aggravated felony punishable with imprisonment for life or up to 10 years and fine."
+  },
+  {
+    "id": "scen-ch18-02",
+    "section": "bns-346",
+    "chapter": "XVIII",
+    "scenario": "A senior accountant at an IT logistics company doctored digital ledger balances and erased vendor invoice entries in the ERP database to conceal an ongoing embezzlement scheme. Which section of BNS penalizes falsification of accounts by a clerk, employee or officer?",
+    "options": [
+      "BNS Section 346 (Falsification of accounts)",
+      "BNS Section 336 (Simple forgery)",
+      "BNS Section 318 (Cheating)",
+      "BNS Section 341"
+    ],
+    "answer": "BNS Section 346 (Falsification of accounts)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 346 replaces IPC Section 477A, penalizing falsification, alteration, destruction, or doctoring of accounts, ledgers, or digital registers with intent to defraud, carrying imprisonment up to 7 years or fine."
+  },
+  {
+    "id": "scen-ch18-03",
+    "section": "bns-341",
+    "chapter": "XVIII",
+    "scenario": "A job applicant presents a forged university engineering degree certificate to the public service commission knowing that it is counterfeit. Under BNS Section 341 (formerly IPC Sections 470 & 471), how is the person using a forged document as genuine punished?",
+    "options": [
+      "Punished in the same manner as if the offender had forged the document",
+      "Exempt from penal liability if he did not print it himself",
+      "Only subject to an administrative fine not exceeding Rs. 500",
+      "Imprisonment strictly limited to 6 months"
+    ],
+    "answer": "Punished in the same manner as if the offender had forged the document",
+    "correctIndex": 0,
+    "explanation": "BNS Section 341 merges IPC Sections 470 and 471, mandating that anyone who fraudulently or dishonestly uses a forged document or electronic record as genuine shall be punished in the exact same manner as if they had forged it."
+  },
+  {
+    "id": "scen-ch19-01",
+    "section": "bns-356",
+    "chapter": "XIX",
+    "scenario": "Under BNS Section 356 (which consolidates IPC Sections 499-502 for criminal defamation), what novel alternative sentencing option has been introduced alongside simple imprisonment up to 2 years and fine?",
+    "options": [
+      "Community service",
+      "Mandatory public apology published in national newspapers",
+      "Solitary confinement for 30 days",
+      "Suspension of social media accounts for 1 year"
+    ],
+    "answer": "Community service",
+    "correctIndex": 0,
+    "explanation": "BNS Section 356 introduces community service as an explicit reformative punishment for criminal defamation, giving judicial magistrates the discretion to order community service instead of or in addition to simple imprisonment and fine."
+  },
+  {
+    "id": "scen-ch19-02",
+    "section": "bns-351",
+    "chapter": "XIX",
+    "scenario": "A loan shark sends WhatsApp text messages threatening to shoot a borrower and set fire to his family home unless he immediately transfers extortion money. Under BNS Section 351 (formerly IPC Section 506), what is the punishment when criminal intimidation involves a threat to cause death or grievous hurt?",
+    "options": [
+      "Imprisonment of either description extending up to 7 years, or fine, or both",
+      "Imprisonment up to 2 years only",
+      "Imprisonment up to 1 year and mandatory community service",
+      "Life imprisonment"
+    ],
+    "answer": "Imprisonment of either description extending up to 7 years, or fine, or both",
+    "correctIndex": 0,
+    "explanation": "Under BNS Section 351, while baseline criminal intimidation carries up to 2 years imprisonment, where the threat is to cause death or grievous hurt, or destruction of property by fire, the punishment extends up to 7 years or fine."
+  },
+  {
+    "id": "scen-ch19-03",
+    "section": "bns-357",
+    "chapter": "XIX",
+    "scenario": "An intoxicated patron creates a loud public nuisance inside a railway waiting room, hurling abuse and harassing travelers. Under BNS Section 357 (which replaces IPC Section 510), what penalties may be imposed?",
+    "options": [
+      "Simple imprisonment up to 24 hours, or fine up to Rs. 1,000, or both, or community service",
+      "Simple imprisonment up to 24 hours, or fine up to Rs. 10 (the colonial rate)",
+      "Mandatory 6 months rigorous imprisonment in a detox facility",
+      "Summary expulsion from public transport without criminal trial"
+    ],
+    "answer": "Simple imprisonment up to 24 hours, or fine up to Rs. 1,000, or both, or community service",
+    "correctIndex": 0,
+    "explanation": "BNS Section 357 replaces IPC Section 510, updating the maximum fine ceiling from the colonial Rs. 10 to Rs. 1,000, while adding community service as an alternative sentencing discretion alongside 24 hours simple imprisonment."
+  },
+  {
+    "id": "scen-ch20-01",
+    "section": "bns-358",
+    "chapter": "XX",
+    "scenario": "Which section of the Bharatiya Nyaya Sanhita, 2023 expressly repeals the Indian Penal Code, 1860 (Act 45 of 1860)?",
+    "options": [
+      "BNS Section 358",
+      "BNS Section 1",
+      "BNS Section 350",
+      "BNS Section 100"
+    ],
+    "answer": "BNS Section 358",
+    "correctIndex": 0,
+    "explanation": "BNS Section 358 is the concluding section of the Sanhita, formally repealing the 1860 Indian Penal Code while enacting customary transition and savings clauses."
+  },
+  {
+    "id": "scen-ch20-02",
+    "section": "bns-358",
+    "chapter": "XX",
+    "scenario": "An alleged cheating and forgery offence was committed in December 2022, well prior to the Bharatiya Nyaya Sanhita coming into force on 1 July 2024. Under the savings provisions of BNS Section 358, how is the offence investigated and tried?",
+    "options": [
+      "Under the provisions of the repealed Indian Penal Code, 1860 as if the BNS had not been enacted",
+      "The prosecution lapses automatically due to the repeal of the IPC",
+      "The offender must be retroactively re-indicted under BNS sections with enhanced punishments",
+      "The case must be transferred to an arbitration tribunal"
+    ],
+    "answer": "Under the provisions of the repealed Indian Penal Code, 1860 as if the BNS had not been enacted",
+    "correctIndex": 0,
+    "explanation": "Under Section 358(2) of the BNS, the repeal of the IPC does not affect any penalty incurred, right acquired, or ongoing legal proceedings in respect of offences committed prior to the commencement of the BNS; they continue to be governed by the IPC."
+  },
+  {
+    "id": "scen-ch20-03",
+    "section": "bns-358",
+    "chapter": "XX",
+    "scenario": "How many total sections does the Bharatiya Nyaya Sanhita, 2023 contain across its 20 chapters, culminating in Section 358 (Repeal and Savings)?",
+    "options": [
+      "358 sections",
+      "511 sections",
+      "484 sections",
+      "320 sections"
+    ],
+    "answer": "358 sections",
+    "correctIndex": 0,
+    "explanation": "The Bharatiya Nyaya Sanhita streamlined the 511 sections of the Indian Penal Code into 358 sections arranged across 20 chapters, concluding with Section 358."
   }
 ]

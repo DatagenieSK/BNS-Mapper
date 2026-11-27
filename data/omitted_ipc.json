@@ -1,0 +1,93 @@
+[
+  {
+    "ipc": "124A",
+    "title": "Sedition",
+    "reason": "Omitted. The colonial offence of sedition was formally dropped in the BNS. In its place, BNS Section 152 penalizes acts endangering sovereignty, unity, and integrity of India without using the term 'sedition'.",
+    "status": "Omitted as colonial offence (Replaced conceptually by BNS 152)",
+    "tags": ["sedition", "omitted", "free speech", "colonial law", "sovereignty"]
+  },
+  {
+    "ipc": "309",
+    "title": "Attempt to commit suicide",
+    "reason": "Substantially dropped. Ordinary attempt to commit suicide is decriminalized in line with Section 115 of the Mental Healthcare Act, 2017. BNS Section 226 only penalizes suicide attempts made specifically to compel or restrain a public servant from discharging official duty.",
+    "status": "Substantially Dropped (Limited strictly to BNS 226)",
+    "tags": ["suicide attempt", "mental health", "decriminalized", "public servant"]
+  },
+  {
+    "ipc": "310",
+    "title": "Thug",
+    "reason": "Omitted. Archaic colonial provision originally aimed at historical highway gangs; modern organized criminal syndicates are now governed by BNS Section 111.",
+    "status": "Omitted as Obsolete (Organized crime now in BNS 111)",
+    "tags": ["thug", "colonial", "obsolete", "organized crime"]
+  },
+  {
+    "ipc": "311",
+    "title": "Punishment of thug",
+    "reason": "Omitted along with Section 310.",
+    "status": "Omitted as Obsolete",
+    "tags": ["thug", "colonial", "obsolete"]
+  },
+  {
+    "ipc": "377",
+    "title": "Unnatural offences",
+    "reason": "Substantially dropped. Consensual adult sexual acts were decriminalized by the Supreme Court in Navtej Singh Johar (2018). Non-consensual acts, bestiality, and sexual assault against persons and minors are prosecuted under BNS rape provisions and the POCSO Act.",
+    "status": "Omitted / Struck Down by Supreme Court",
+    "tags": ["section 377", "lgbtq", "decriminalized", "consensual sex", "navtej johar"]
+  },
+  {
+    "ipc": "497",
+    "title": "Adultery",
+    "reason": "Omitted. Unanimously struck down as unconstitutional, gender-discriminatory, and violative of Articles 14 and 21 by the Supreme Court in Joseph Shine v. Union of India (2018). Completely discarded in BNS.",
+    "status": "Omitted / Struck Down as Unconstitutional",
+    "tags": ["adultery", "matrimonial", "decriminalized", "joseph shine", "fundamental rights"]
+  },
+  {
+    "ipc": "498",
+    "title": "Enticing or taking away or detaining with criminal intent a married woman",
+    "reason": "Omitted. Archaic provision treating married women as the proprietary chattel of the husband; removed to uphold gender equality.",
+    "status": "Omitted as Archaic / Gender-Discriminatory",
+    "tags": ["married woman", "chattel", "omitted", "gender equality"]
+  },
+  {
+    "ipc": "236",
+    "title": "Abetting in India the counterfeiting out of India of coin",
+    "reason": "Omitted. Colonial distinction of Queen's/King's coin vs foreign coins consolidated into unified currency notes and coin provisions (BNS 178-188).",
+    "status": "Omitted / Consolidated",
+    "tags": ["coin", "colonial", "currency"]
+  },
+  {
+    "ipc": "238",
+    "title": "Import or export of counterfeits of the Queen's coin",
+    "reason": "Omitted as obsolete colonial monarchical coinage provision.",
+    "status": "Omitted as Obsolete",
+    "tags": ["queen coin", "colonial", "currency", "monarchy"]
+  },
+  {
+    "ipc": "244",
+    "title": "Person employed in mint causing coin to be of different weight or composition from that fixed by law",
+    "reason": "Omitted. Regulated under special mint, coinage, and Reserve Bank administrative legislation.",
+    "status": "Omitted (Covered under Special Mint Acts)",
+    "tags": ["mint", "coinage", "administrative"]
+  },
+  {
+    "ipc": "245",
+    "title": "Unlawfully taking coining instrument from mint",
+    "reason": "Omitted. Governed by specific security and Coinage Acts.",
+    "status": "Omitted (Covered under Special Coinage Acts)",
+    "tags": ["mint", "coinage", "security"]
+  },
+  {
+    "ipc": "444",
+    "title": "Lurking house-trespass by night",
+    "reason": "Consolidated into BNS Section 331 (House-trespass or house-breaking by night).",
+    "status": "Consolidated into BNS 331",
+    "tags": ["trespass", "night trespass", "consolidated"]
+  },
+  {
+    "ipc": "446",
+    "title": "House-breaking by night",
+    "reason": "Consolidated into BNS Section 331 (House-trespass or house-breaking by night).",
+    "status": "Consolidated into BNS 331",
+    "tags": ["house breaking", "night burglary", "consolidated"]
+  }
+]
