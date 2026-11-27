@@ -948,5 +948,65 @@
     "answer": "BNS Section 223 (Disobedience to order duly promulgated by public servant)",
     "correctIndex": 0,
     "explanation": "BNS Section 223 replaces old IPC Section 188, punishing disobedience to orders promulgated by a public servant where it causes danger to human life or rioting with imprisonment up to 6 months or fine up to ₹5,000 or both."
+  },
+  {
+    "id": "scen-ch14-01",
+    "section": "bns-228",
+    "chapter": "XIV",
+    "scenario": "An IT technician working for a private firm deliberately edits electronic server logs to falsely show that an executive logged into a computer from a remote city during a burglary, intending this digital record to be produced in court to mislead the trial judge. Under which section of BNS is fabricating false evidence in electronic records defined?",
+    "options": [
+      "BNS Section 228 (Fabricating false evidence)",
+      "BNS Section 227 (Giving false evidence)",
+      "BNS Section 241 (Destruction of document)",
+      "BNS Section 267 (Contempt of court)"
+    ],
+    "answer": "BNS Section 228 (Fabricating false evidence)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 228 (formerly IPC Section 192) defines fabricating false evidence, explicitly covering making false entries in electronic records or creating misleading circumstances to influence judicial proceedings."
+  },
+  {
+    "id": "scen-ch14-02",
+    "section": "bns-232",
+    "chapter": "XIV",
+    "scenario": "A gang member visits the residence of an eyewitness before a trial and threatens to shoot his children unless he retracts his police statement and swears a false alibi in court. Which section of BNS specifically penalizes threatening any person to give false evidence?",
+    "options": [
+      "BNS Section 232 (Threatening any person to give false evidence)",
+      "BNS Section 229",
+      "BNS Section 246",
+      "BNS Section 250"
+    ],
+    "answer": "BNS Section 232 (Threatening any person to give false evidence)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 232 (formerly IPC Section 195A) specifically criminalizes threatening, intimidating, or coercing any person to give false evidence with imprisonment up to 7 years, fine, or matching punishment."
+  },
+  {
+    "id": "scen-ch14-03",
+    "section": "bns-238",
+    "chapter": "XIV",
+    "scenario": "After a fatal shooting, the perpetrator's associate burns the bloodstained clothes, throws the pistol into a deep river, and formats the hotel CCTV hard drive to screen the shooter from murder charges. Which section of BNS penalizes causing disappearance of evidence?",
+    "options": [
+      "BNS Section 238 (Causing disappearance of evidence of offence, or giving false information to screen offender)",
+      "BNS Section 249 (Harbouring)",
+      "BNS Section 262 (Escape)",
+      "BNS Section 255"
+    ],
+    "answer": "BNS Section 238 (Causing disappearance of evidence of offence, or giving false information to screen offender)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 238 (formerly IPC Section 201) punishes causing evidence of an offence to disappear with intent to screen an offender, carrying up to 7 years imprisonment when the crime committed is capital."
+  },
+  {
+    "id": "scen-ch14-04",
+    "section": "bns-269",
+    "chapter": "XIV",
+    "scenario": "An accused charged with commercial cheating is released on bail after executing a bond. He deliberately skips his trial hearings, changes his phone number, and relocates to another state without informing the court. Under BNS Section 269, upon whom does the burden of proving sufficient cause for non-appearance lie?",
+    "options": [
+      "The burden of proving sufficient cause lies squarely upon the accused",
+      "The prosecution must prove beyond reasonable doubt that the accused had no excuse",
+      "The court bailiff must prove lack of notice",
+      "The surety alone bears the burden of proof"
+    ],
+    "answer": "The burden of proving sufficient cause lies squarely upon the accused",
+    "correctIndex": 0,
+    "explanation": "Under BNS Section 269 (formerly IPC Section 229A), failure to appear in court after release on bail or bond is an independent cognizable offence where the burden of proving sufficient cause lies specifically upon the accused."
   }
 ]

@@ -3,7 +3,7 @@
  * Caches static shell, styles, scripts, chapters index, and chapter datasets for offline study.
  */
 
-const CACHE_NAME = 'bns-mapper-v7';
+const CACHE_NAME = 'bns-mapper-v8';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -31,6 +31,7 @@ const STATIC_ASSETS = [
   './data/chapters/chXI.json',
   './data/chapters/chXII.json',
   './data/chapters/chXIII.json',
+  './data/chapters/chXIV.json',
   './data/sections.json',
   './data/bnss_sections.json',
   './data/bsa_sections.json',
