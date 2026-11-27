@@ -1,17 +1,27 @@
 /**
  * Storage module for BNS Mapper
- * Handles bookmarks, active search direction, and user theme preferences via localStorage
+ * Handles bookmarks, compare pins, active statute pair, theme, Leitner flashcards, and quiz statistics
  */
 
 const STORAGE_KEYS = {
   BOOKMARKS: 'bns_mapper_bookmarks',
   DIRECTION: 'bns_mapper_direction',
-  THEME: 'bns_mapper_theme'
+  THEME: 'bns_mapper_theme',
+  COMPARE: 'bns_mapper_compare',
+  STATUTE: 'bns_mapper_statute',
+  QUIZ_STATS: 'bns_mapper_quiz_stats',
+  LEITNER_BOXES: 'bns_mapper_leitner_boxes'
 };
 
 export const DIRECTIONS = {
   IPC_TO_BNS: 'ipc-to-bns',
   BNS_TO_IPC: 'bns-to-ipc'
+};
+
+export const STATUTES = {
+  IPC_BNS: 'ipc_bns',
+  CRPC_BNSS: 'crpc_bnss',
+  IEA_BSA: 'iea_bsa'
 };
 
 export const storage = {
@@ -21,14 +31,13 @@ export const storage = {
       const data = localStorage.getItem(STORAGE_KEYS.BOOKMARKS);
       return data ? JSON.parse(data) : [];
     } catch (e) {
-      console.warn('Could not read bookmarks from localStorage:', e);
+      console.warn('Could not read bookmarks:', e);
       return [];
     }
   },
 
   isBookmarked(id) {
-    const list = this.getBookmarks();
-    return list.includes(id);
+    return this.getBookmarks().includes(id);
   },
 
   toggleBookmark(id) {
@@ -48,7 +57,7 @@ export const storage = {
       localStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(list));
       window.dispatchEvent(new CustomEvent('bookmarks-updated', { detail: { id, isBookmarked: newState, count: list.length } }));
     } catch (e) {
-      console.warn('Could not save bookmarks to localStorage:', e);
+      console.warn('Could not save bookmarks:', e);
     }
 
     return newState;
@@ -63,7 +72,70 @@ export const storage = {
     }
   },
 
-  // --- Direction Toggle (IPC -> BNS vs BNS -> IPC) ---
+  // --- Compare Mode (Pin up to 3 sections) ---
+  getCompareSections() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.COMPARE);
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      return [];
+    }
+  },
+
+  isComparing(id) {
+    return this.getCompareSections().includes(id);
+  },
+
+  toggleCompare(id) {
+    let list = this.getCompareSections();
+    const index = list.indexOf(id);
+    let added = false;
+
+    if (index === -1) {
+      if (list.length >= 3) {
+        return { success: false, reason: 'max_reached', list };
+      }
+      list.push(id);
+      added = true;
+    } else {
+      list.splice(index, 1);
+      added = false;
+    }
+
+    try {
+      localStorage.setItem(STORAGE_KEYS.COMPARE, JSON.stringify(list));
+      window.dispatchEvent(new CustomEvent('compare-updated', { detail: { list, id, added } }));
+    } catch (e) {
+      console.warn('Could not save compare list:', e);
+    }
+
+    return { success: true, added, list };
+  },
+
+  clearCompare() {
+    try {
+      localStorage.removeItem(STORAGE_KEYS.COMPARE);
+      window.dispatchEvent(new CustomEvent('compare-updated', { detail: { list: [] } }));
+    } catch (e) {}
+  },
+
+  // --- Active Statute Pair Selector ---
+  getActiveStatute() {
+    try {
+      return localStorage.getItem(STORAGE_KEYS.STATUTE) || STATUTES.IPC_BNS;
+    } catch (e) {
+      return STATUTES.IPC_BNS;
+    }
+  },
+
+  setActiveStatute(statute) {
+    try {
+      localStorage.setItem(STORAGE_KEYS.STATUTE, statute);
+      window.dispatchEvent(new CustomEvent('statute-changed', { detail: { statute } }));
+    } catch (e) {}
+  },
+
+  // --- Direction Toggle ---
   getDirection() {
     try {
       const dir = localStorage.getItem(STORAGE_KEYS.DIRECTION);
@@ -77,9 +149,7 @@ export const storage = {
     try {
       localStorage.setItem(STORAGE_KEYS.DIRECTION, direction);
       window.dispatchEvent(new CustomEvent('direction-changed', { detail: { direction } }));
-    } catch (e) {
-      console.warn('Could not set direction in localStorage:', e);
-    }
+    } catch (e) {}
   },
 
   // --- Theme Toggle ---
@@ -96,9 +166,7 @@ export const storage = {
       localStorage.setItem(STORAGE_KEYS.THEME, theme);
       this.applyTheme(theme);
       window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme } }));
-    } catch (e) {
-      console.warn('Could not set theme in localStorage:', e);
-    }
+    } catch (e) {}
   },
 
   applyTheme(theme) {
@@ -108,7 +176,6 @@ export const storage = {
     } else if (theme === 'light') {
       root.setAttribute('data-theme', 'light');
     } else {
-      // Auto: follow system
       const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       if (prefersDark) {
         root.setAttribute('data-theme', 'dark');
@@ -121,14 +188,145 @@ export const storage = {
   initTheme() {
     const savedTheme = this.getTheme();
     this.applyTheme(savedTheme);
-
-    // Listen to OS theme changes if on auto
     if (window.matchMedia) {
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
         if (this.getTheme() === 'auto') {
           this.applyTheme('auto');
         }
       });
     }
+  },
+
+  // --- Leitner Spaced-Repetition System (Boxes 1 - 5) ---
+  getLeitnerBoxes() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.LEITNER_BOXES);
+      return data ? JSON.parse(data) : { 1: [], 2: [], 3: [], 4: [], 5: [] };
+    } catch (e) {
+      return { 1: [], 2: [], 3: [], 4: [], 5: [] };
+    }
+  },
+
+  updateLeitnerCard(sectionId, isCorrect) {
+    const boxes = this.getLeitnerBoxes();
+    let currentBox = 1;
+
+    // Find card's current box
+    for (let b = 1; b <= 5; b++) {
+      if (!boxes[b]) boxes[b] = [];
+      const idx = boxes[b].indexOf(sectionId);
+      if (idx !== -1) {
+        currentBox = b;
+        boxes[b].splice(idx, 1);
+        break;
+      }
+    }
+
+    let targetBox = 1;
+    if (isCorrect) {
+      targetBox = Math.min(5, currentBox + 1);
+    } else {
+      targetBox = 1; // Drop back to Box 1 on error
+    }
+
+    if (!boxes[targetBox]) boxes[targetBox] = [];
+    boxes[targetBox].push(sectionId);
+
+    try {
+      localStorage.setItem(STORAGE_KEYS.LEITNER_BOXES, JSON.stringify(boxes));
+      window.dispatchEvent(new CustomEvent('leitner-updated', { detail: { sectionId, targetBox, isCorrect } }));
+    } catch (e) {}
+
+    return targetBox;
+  },
+
+  resetLeitner() {
+    try {
+      localStorage.removeItem(STORAGE_KEYS.LEITNER_BOXES);
+      window.dispatchEvent(new CustomEvent('leitner-updated', { detail: { reset: true } }));
+    } catch (e) {}
+  },
+
+  // --- Quiz Stats, Streaks & Badges ---
+  getQuizStats() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.QUIZ_STATS);
+      return data ? JSON.parse(data) : {
+        totalAttempted: 0,
+        totalCorrect: 0,
+        currentStreak: 0,
+        maxStreak: 0,
+        history: [], // { date, score, total, mode, chapter }
+        chapterStats: {}, // { chapterName: { correct: 0, total: 0 } }
+        badges: []
+      };
+    } catch (e) {
+      return { totalAttempted: 0, totalCorrect: 0, currentStreak: 0, maxStreak: 0, history: [], chapterStats: {}, badges: [] };
+    }
+  },
+
+  recordQuizSession({ score, total, mode = 'mixed', chapter = 'All Chapters' }) {
+    const stats = this.getQuizStats();
+    stats.totalAttempted += total;
+    stats.totalCorrect += score;
+
+    // Update streak based on session percentage >= 70%
+    const passed = (score / total) >= 0.7;
+    if (passed) {
+      stats.currentStreak += 1;
+      if (stats.currentStreak > stats.maxStreak) {
+        stats.maxStreak = stats.currentStreak;
+      }
+    } else {
+      stats.currentStreak = 0;
+    }
+
+    // Add session history (keep last 12 for dashboard chart)
+    const now = new Date();
+    const dateStr = `${now.getMonth() + 1}/${now.getDate()}`;
+    stats.history.push({
+      date: dateStr,
+      score,
+      total,
+      pct: Math.round((score / total) * 100),
+      mode,
+      chapter
+    });
+    if (stats.history.length > 15) {
+      stats.history = stats.history.slice(-15);
+    }
+
+    // Track chapter accuracy
+    if (chapter && chapter !== 'All Chapters') {
+      if (!stats.chapterStats[chapter]) {
+        stats.chapterStats[chapter] = { correct: 0, total: 0 };
+      }
+      stats.chapterStats[chapter].correct += score;
+      stats.chapterStats[chapter].total += total;
+    }
+
+    // Check Badges
+    const badgeList = stats.badges || [];
+    const checkBadge = (id, name, desc) => {
+      if (!badgeList.some(b => b.id === id)) {
+        badgeList.push({ id, name, desc, date: dateStr });
+      }
+    };
+
+    if (stats.totalAttempted >= 1) checkBadge('first_step', 'First Step', 'Completed your first quiz session');
+    if (stats.totalCorrect >= 20) checkBadge('bns_novice', 'BNS Novice', 'Answered 20 questions correctly');
+    if (stats.totalCorrect >= 50) checkBadge('bns_pro', 'Legal Scholar', 'Answered 50 questions correctly');
+    if (stats.currentStreak >= 3) checkBadge('streak_3', 'On Fire', 'Maintained a 3-session streak (70%+)');
+    if (stats.currentStreak >= 5) checkBadge('streak_master', 'Streak Master', 'Achieved a 5-session winning streak');
+    if (score === total && total >= 5) checkBadge('perfect_score', 'Centurion', 'Scored 100% on a quiz with at least 5 questions');
+
+    stats.badges = badgeList;
+
+    try {
+      localStorage.setItem(STORAGE_KEYS.QUIZ_STATS, JSON.stringify(stats));
+      window.dispatchEvent(new CustomEvent('quiz-stats-updated', { detail: { stats } }));
+    } catch (e) {}
+
+    return stats;
   }
 };

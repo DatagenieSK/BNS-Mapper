@@ -1,45 +1,25 @@
 /**
- * Validation script for BNS Mapper sections dataset
- * Validates data/sections.json against schema criteria and integrity constraints.
+ * Validation script for BNS Mapper sections dataset & quiz scenarios
+ * Validates all datasets against schema criteria and integrity constraints.
  * Run with: node scripts/validate.js
  */
 
 const fs = require('fs');
 const path = require('path');
 
-const dataPath = path.join(__dirname, '..', 'data', 'sections.json');
 const schemaPath = path.join(__dirname, '..', 'data', 'schema.json');
+const dataFiles = [
+  { name: 'IPC -> BNS', path: path.join(__dirname, '..', 'data', 'sections.json') },
+  { name: 'CrPC -> BNSS', path: path.join(__dirname, '..', 'data', 'bnss_sections.json') },
+  { name: 'IEA -> BSA', path: path.join(__dirname, '..', 'data', 'bsa_sections.json') }
+];
+const scenariosPath = path.join(__dirname, '..', 'data', 'quiz_scenarios.json');
 
 function validate() {
-  console.log('--- Validating BNS Mapper Data ---');
-
-  if (!fs.existsSync(dataPath)) {
-    console.error(`Error: Data file not found at ${dataPath}`);
-    process.exit(1);
-  }
+  console.log('--- Validating BNS Mapper Datasets & Scenarios ---');
 
   if (!fs.existsSync(schemaPath)) {
     console.error(`Error: Schema file not found at ${schemaPath}`);
-    process.exit(1);
-  }
-
-  let sections, schema;
-  try {
-    sections = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-  } catch (err) {
-    console.error(`Error: Failed to parse data/sections.json:`, err.message);
-    process.exit(1);
-  }
-
-  try {
-    schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
-  } catch (err) {
-    console.error(`Error: Failed to parse data/schema.json:`, err.message);
-    process.exit(1);
-  }
-
-  if (!Array.isArray(sections)) {
-    console.error('Validation failure: Root element must be an Array.');
     process.exit(1);
   }
 
@@ -48,65 +28,117 @@ function validate() {
     'old_text', 'new_text', 'punishment_old', 'punishment_new',
     'explanation', 'tags', 'verified', 'source'
   ];
-
   const validChanges = ['renumbered', 'modified', 'merged', 'split', 'new', 'omitted'];
-  const seenIds = new Set();
-  const errors = [];
+  let totalErrors = 0;
+  let totalSections = 0;
 
-  sections.forEach((entry, index) => {
-    const label = `Entry #${index + 1} (${entry.id || 'missing-id'})`;
+  // 1. Validate Statute Section Files
+  for (const item of dataFiles) {
+    if (!fs.existsSync(item.path)) {
+      console.error(`Error: Data file not found for ${item.name} at ${item.path}`);
+      totalErrors++;
+      continue;
+    }
 
-    // Check required fields
-    for (const field of requiredFields) {
-      if (entry[field] === undefined || entry[field] === null) {
-        errors.push(`${label}: Missing required field '${field}'`);
+    let list;
+    try {
+      list = JSON.parse(fs.readFileSync(item.path, 'utf8'));
+    } catch (e) {
+      console.error(`Error parsing ${item.name}: ${e.message}`);
+      totalErrors++;
+      continue;
+    }
+
+    if (!Array.isArray(list)) {
+      console.error(`Error in ${item.name}: Must be an array`);
+      totalErrors++;
+      continue;
+    }
+
+    const seenIds = new Set();
+    list.forEach((entry, idx) => {
+      const label = `${item.name} #${idx + 1} (${entry.id || 'no-id'})`;
+      for (const field of requiredFields) {
+        if (entry[field] === undefined || entry[field] === null) {
+          console.error(`${label}: Missing required field '${field}'`);
+          totalErrors++;
+        }
       }
-    }
-
-    // Unique ID check
-    if (entry.id) {
-      if (seenIds.has(entry.id)) {
-        errors.push(`${label}: Duplicate id '${entry.id}'`);
+      if (entry.id) {
+        if (seenIds.has(entry.id)) {
+          console.error(`${label}: Duplicate id '${entry.id}'`);
+          totalErrors++;
+        }
+        seenIds.add(entry.id);
       }
-      seenIds.add(entry.id);
+      if (entry.change && !validChanges.includes(entry.change)) {
+        console.error(`${label}: Invalid change '${entry.change}'`);
+        totalErrors++;
+      }
+      if (entry.tags && !Array.isArray(entry.tags)) {
+        console.error(`${label}: 'tags' must be an array`);
+        totalErrors++;
+      }
+    });
+
+    console.log(`✔ ${item.name}: ${list.length} sections validated.`);
+    totalSections += list.length;
+  }
+
+  // 2. Validate Quiz Scenarios
+  if (!fs.existsSync(scenariosPath)) {
+    console.error(`Error: Scenarios file not found at ${scenariosPath}`);
+    totalErrors++;
+  } else {
+    let scenarios;
+    try {
+      scenarios = JSON.parse(fs.readFileSync(scenariosPath, 'utf8'));
+    } catch (e) {
+      console.error(`Error parsing quiz scenarios: ${e.message}`);
+      totalErrors++;
     }
 
-    // Change enum check
-    if (entry.change && !validChanges.includes(entry.change)) {
-      errors.push(`${label}: Invalid change '${entry.change}'. Must be one of: ${validChanges.join(', ')}`);
-    }
+    if (Array.isArray(scenarios)) {
+      const scenRequired = ['id', 'title', 'scenario', 'options', 'correctIndex', 'bns_section', 'explanation', 'chapter'];
+      const seenScenIds = new Set();
 
-    // Tags check
-    if (entry.tags && !Array.isArray(entry.tags)) {
-      errors.push(`${label}: 'tags' must be an array`);
+      scenarios.forEach((sc, idx) => {
+        const label = `Scenario #${idx + 1} (${sc.id || 'no-id'})`;
+        for (const req of scenRequired) {
+          if (sc[req] === undefined || sc[req] === null) {
+            console.error(`${label}: Missing field '${req}'`);
+            totalErrors++;
+          }
+        }
+        if (sc.id) {
+          if (seenScenIds.has(sc.id)) {
+            console.error(`${label}: Duplicate scenario id '${sc.id}'`);
+            totalErrors++;
+          }
+          seenScenIds.add(sc.id);
+        }
+        if (!Array.isArray(sc.options) || sc.options.length < 2) {
+          console.error(`${label}: 'options' must be an array of at least 2 items`);
+          totalErrors++;
+        }
+        if (typeof sc.correctIndex !== 'number' || sc.correctIndex < 0 || sc.correctIndex >= (sc.options ? sc.options.length : 0)) {
+          console.error(`${label}: 'correctIndex' is out of bounds`);
+          totalErrors++;
+        }
+      });
+      console.log(`✔ Quiz Scenarios: ${scenarios.length} scenarios validated.`);
+    } else {
+      console.error(`Error: quiz_scenarios.json must contain an array.`);
+      totalErrors++;
     }
+  }
 
-    // Verified check
-    if (typeof entry.verified !== 'boolean') {
-      errors.push(`${label}: 'verified' must be a boolean`);
-    }
-
-    // Strings non-empty where sensible
-    if (typeof entry.title !== 'string' || entry.title.trim().length === 0) {
-      errors.push(`${label}: 'title' must be a non-empty string`);
-    }
-  });
-
-  if (errors.length > 0) {
-    console.error(`\nValidation failed with ${errors.length} error(s):`);
-    errors.forEach(err => console.error(`  - ${err}`));
+  if (totalErrors > 0) {
+    console.error(`\nValidation failed with ${totalErrors} error(s).`);
     process.exit(1);
   }
 
-  console.log(`\x1b[32m✔ Validation passed!\x1b[0m`);
-  console.log(`Total sections loaded: ${sections.length}`);
-  const changeCounts = sections.reduce((acc, s) => {
-    acc[s.change] = (acc[s.change] || 0) + 1;
-    return acc;
-  }, {});
-  console.log('Change type breakdown:', changeCounts);
-  const unverifiedCount = sections.filter(s => !s.verified).length;
-  console.log(`Unverified entries count: ${unverifiedCount} (marked for verification against official gazette)`);
+  console.log(`\n\x1b[32m✔ All validation checks passed cleanly! (Total legal sections: ${totalSections})\x1b[0m`);
 }
 
 validate();

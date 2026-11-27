@@ -1,0 +1,322 @@
+[
+  {
+    "id": "scen-01",
+    "title": "The Gold Chain Grab on MG Road",
+    "scenario": "Ramesh, while riding pillion on a motorcycle, quickly reaches out and violently snatches a gold chain from Sunita's neck as she crosses the street, immediately speeding away. Under IPC, this was charged under Section 379 (theft) or Section 392 (robbery). How is this charged under the BNS?",
+    "options": [
+      "BNS Section 303 (Theft)",
+      "BNS Section 304 (Snatching - dedicated offence)",
+      "BNS Section 309 (Robbery)",
+      "BNS Section 318 (Cheating)"
+    ],
+    "correctIndex": 1,
+    "bns_section": "304",
+    "ipc_section": "379/392",
+    "explanation": "BNS Section 304 specifically creates a distinct statutory offence of 'Snatching' to bridge the gap between simple theft and violent robbery for street crimes.",
+    "chapter": "Offences Against Property"
+  },
+  {
+    "id": "scen-02",
+    "title": "Caste-Motivated Mob Attack",
+    "scenario": "A group of six persons acting in concert brutally attacks and kills a man in a village solely on account of his caste and community affiliation. Under the new BNS, which provision directly penalizes this act with capital punishment or life imprisonment for every member?",
+    "options": [
+      "BNS Section 103(1) general murder read with Section 3(5)",
+      "BNS Section 103(2) (Murder by group / Mob lynching on grounds of caste, race, sex, etc.)",
+      "BNS Section 189 (Unlawful Assembly)",
+      "BNS Section 191 (Rioting)"
+    ],
+    "correctIndex": 1,
+    "bns_section": "103(2)",
+    "ipc_section": "302 read with 149",
+    "explanation": "BNS Section 103(2) is a brand-new sub-section specifically penalizing group murder / mob lynching on grounds of race, caste, community, sex, place of birth, or personal belief.",
+    "chapter": "Offences Affecting the Human Body"
+  },
+  {
+    "id": "scen-03",
+    "title": "First-Time Shoplifting of a Book",
+    "scenario": "A 19-year-old student steals a legal textbook worth ₹1,800 from a bookstore and is caught. This is his first offence, and he immediately restores the book. Under BNS Section 303(2), what unique sentencing option does the Magistrate now have that did not exist in IPC Section 379?",
+    "options": [
+      "Mandatory minimum 6 months rigorous imprisonment",
+      "Community service upon return of the stolen property",
+      "Immediate deportation",
+      "Can only impose fine of at least ₹50,000"
+    ],
+    "correctIndex": 1,
+    "bns_section": "303(2)",
+    "ipc_section": "379",
+    "explanation": "Under BNS Section 303(2) proviso, where stolen property value is under ₹5,000, and it is a first conviction upon return of property/value, community service may be awarded.",
+    "chapter": "Offences Against Property"
+  },
+  {
+    "id": "scen-04",
+    "title": "Social Media Defamation Post",
+    "scenario": "An individual publishes an intentionally false and reputation-damaging allegation against a local merchant on social media. The trial court convicts him of defamation. Under BNS Section 356(2), what reformative punishment can the court now award alongside or instead of imprisonment and fine?",
+    "options": [
+      "Public apology broadcast only",
+      "Community Service",
+      "Bar from using internet for 5 years",
+      "Solitary confinement"
+    ],
+    "correctIndex": 1,
+    "bns_section": "356(2)",
+    "ipc_section": "500",
+    "explanation": "BNS Section 356(2) replaces IPC 500 and explicitly incorporates 'community service' as an alternative punishment for defamation.",
+    "chapter": "Defamation and Intimidation"
+  },
+  {
+    "id": "scen-05",
+    "title": "Doctor's Operating Room Complication",
+    "scenario": "A patient dies following unforeseen complications during surgery performed by a certified surgeon. The family files a complaint of death by negligence. Under BNS Section 106(1), how is the punishment for registered medical practitioners treated compared to ordinary rash acts?",
+    "options": [
+      "Doctor is immune from all criminal prosecution",
+      "Doctor's punishment is capped at 2 years, whereas ordinary death by negligence is up to 5 years",
+      "Doctor faces mandatory 10 years imprisonment",
+      "Doctor is punished under Section 103 for murder"
+    ],
+    "correctIndex": 1,
+    "bns_section": "106(1)",
+    "ipc_section": "304A",
+    "explanation": "While general death by negligence was raised from 2 to 5 years in BNS 106(1), doctors performing medical procedures are specifically capped at up to 2 years.",
+    "chapter": "Offences Affecting the Human Body"
+  },
+  {
+    "id": "scen-06",
+    "title": "Online Financial Fraud by Phishing",
+    "scenario": "Vikram creates a fake bank website and dishonestly induces Priya to transfer ₹2,50,000 to his account. In earlier days, FIRs routinely invoked IPC Section 420. Which corresponding section of the BNS should now be cited in the FIR?",
+    "options": [
+      "BNS Section 318(4)",
+      "BNS Section 420(1)",
+      "BNS Section 303(1)",
+      "BNS Section 111"
+    ],
+    "correctIndex": 0,
+    "bns_section": "318(4)",
+    "ipc_section": "420",
+    "explanation": "IPC Section 420 (cheating and dishonestly inducing delivery of property) is now codified under BNS Section 318(4).",
+    "chapter": "Offences Against Property"
+  },
+  {
+    "id": "scen-07",
+    "title": "Matrimonial Cruelty Complaint",
+    "scenario": "A woman files a complaint that her husband and mother-in-law subjected her to severe harassment over dowry demands. Under IPC, this was covered in Section 498A (offence and definition combined). Under BNS, how has this section been reorganized?",
+    "options": [
+      "Completely repealed and decriminalized",
+      "Split: Section 85 contains the offence/punishment, while Section 86 defines 'cruelty'",
+      "Merged into Section 302",
+      "Shifted to the civil family courts exclusively"
+    ],
+    "correctIndex": 1,
+    "bns_section": "85 and 86",
+    "ipc_section": "498A",
+    "explanation": "IPC Section 498A is split into two sections in BNS: Section 85 prescribes punishment (up to 3 years and fine) and Section 86 defines the dimensions of 'cruelty'.",
+    "chapter": "Offences Against Women and Children"
+  },
+  {
+    "id": "scen-08",
+    "title": "Repeal of Sedition (Rajdroh)",
+    "scenario": "A political activist delivers an anti-government speech criticizing official policy. Under the old IPC, police frequently registered charges under IPC Section 124A (Sedition). What is the status of 'sedition' in the BNS?",
+    "options": [
+      "Retained with identical wording under Section 124",
+      "Sedition term is omitted; Section 152 penalizes acts endangering sovereignty, unity, and integrity with a higher threshold (secession/rebellion)",
+      "No offence against the state exists anymore",
+      "Sedition is now punished with only a small fine"
+    ],
+    "correctIndex": 1,
+    "bns_section": "152",
+    "ipc_section": "124A",
+    "explanation": "The colonial offence of 'sedition' (rajdroh) was omitted. Section 152 of BNS targets acts endangering sovereignty, unity, or integrity of India through secession, armed rebellion, or subversive activities.",
+    "chapter": "Offences Against the State"
+  },
+  {
+    "id": "scen-09",
+    "title": "Syndicate Extortion and Land Grabbing",
+    "scenario": "A criminal syndicate operates an extortion racket, running land-grabbing schemes and contract killings across district lines. Under IPC, prosecutors had to rely on state-specific enactments (like MCOCA) or multiple separate offences. Which new central provision in BNS tackles organized crime?",
+    "options": [
+      "BNS Section 111 (Organised Crime)",
+      "BNS Section 34",
+      "BNS Section 141",
+      "BNS Section 506"
+    ],
+    "correctIndex": 0,
+    "bns_section": "111",
+    "ipc_section": "None",
+    "explanation": "BNS Section 111 introduces a comprehensive central penal provision specifically addressing organized crime syndicates.",
+    "chapter": "Offences Affecting the Human Body"
+  },
+  {
+    "id": "scen-10",
+    "title": "Unnatural Offences and Adult Consensual Acts",
+    "scenario": "A police officer attempts to file an FIR under Section 377 for private consensual relations between two adults. The public prosecutor advises that the provision has changed. What happened to Section 377 IPC in the BNS?",
+    "options": [
+      "It was renumbered as BNS Section 377 without change",
+      "It has been omitted from the BNS",
+      "The punishment was doubled to 20 years",
+      "It was moved to the Income Tax Act"
+    ],
+    "correctIndex": 1,
+    "bns_section": "Omitted",
+    "ipc_section": "377",
+    "explanation": "IPC Section 377 has been omitted from the Bharatiya Nyaya Sanhita, reflecting the Supreme Court's ruling in Navtej Singh Johar (2018).",
+    "chapter": "Offences Affecting the Human Body"
+  },
+  {
+    "id": "scen-11",
+    "title": "Attempt to Murder in a Street Brawl",
+    "scenario": "During a heated dispute, Karan stabs an unarmed victim in the chest with intent to kill, but timely surgical intervention saves the victim's life. What was IPC Section 307 renumbered to in the BNS?",
+    "options": [
+      "BNS Section 109",
+      "BNS Section 103",
+      "BNS Section 115",
+      "BNS Section 140"
+    ],
+    "correctIndex": 0,
+    "bns_section": "109",
+    "ipc_section": "307",
+    "explanation": "Attempt to murder, previously the famous Section 307 IPC, is now Section 109 of the BNS.",
+    "chapter": "Offences Affecting the Human Body"
+  },
+  {
+    "id": "scen-12",
+    "title": "Unlawful Assembly common intention vs common object",
+    "scenario": "Five college students assemble outside a government office to forcibly prevent a public servant from entering. Which section defines this unlawful assembly in BNS (formerly IPC 141)?",
+    "options": [
+      "BNS Section 189(1)",
+      "BNS Section 141",
+      "BNS Section 101",
+      "BNS Section 22"
+    ],
+    "correctIndex": 0,
+    "bns_section": "189(1)",
+    "ipc_section": "141",
+    "explanation": "The definition of unlawful assembly moved from IPC Section 141 to BNS Section 189(1).",
+    "chapter": "Offences Against Public Tranquillity"
+  },
+  {
+    "id": "scen-13",
+    "title": "Eve-Teasing and Indecent Gestures",
+    "scenario": "A man utters sexually vulgar insults and makes obscene gestures at a woman standing at a bus stop. In IPC, this was charged under Section 509. Which section of BNS now protects the modesty of a woman against words and gestures?",
+    "options": [
+      "BNS Section 79",
+      "BNS Section 509",
+      "BNS Section 354",
+      "BNS Section 100"
+    ],
+    "correctIndex": 0,
+    "bns_section": "79",
+    "ipc_section": "509",
+    "explanation": "IPC Section 509 is renumbered to Section 79 of BNS, positioned in Chapter V on offences against women and children.",
+    "chapter": "Offences Against Women and Children"
+  },
+  {
+    "id": "scen-14",
+    "title": "Criminal Breach of Trust by Warehouse Manager",
+    "scenario": "A warehouse manager entrusted with 1,000 laptops sells 200 of them on the black market for personal gain. Under IPC Section 406, the maximum imprisonment was 3 years. What is the maximum imprisonment under BNS Section 316(2)?",
+    "options": [
+      "1 year",
+      "3 years (unchanged)",
+      "5 years (enhanced punishment)",
+      "10 years"
+    ],
+    "correctIndex": 2,
+    "bns_section": "316(2)",
+    "ipc_section": "406",
+    "explanation": "Under BNS Section 316(2), the maximum penalty for criminal breach of trust has been enhanced from 3 years to 5 years imprisonment.",
+    "chapter": "Offences Against Property"
+  },
+  {
+    "id": "scen-15",
+    "title": "Common Intention Rule Relocation",
+    "scenario": "Three associates plan a bank heist and execute it together. The prosecution seeks to hold each liable for acts done in furtherance of common intention (formerly IPC Section 34). Where is this constructive liability principle located in BNS?",
+    "options": [
+      "BNS Section 3(5)",
+      "BNS Section 34",
+      "BNS Section 100",
+      "BNS Section 120"
+    ],
+    "correctIndex": 0,
+    "bns_section": "3(5)",
+    "ipc_section": "34",
+    "explanation": "The common intention principle of IPC Section 34 is now codified as sub-section (5) of Section 3 in BNS.",
+    "chapter": "General Explanations and Exceptions"
+  },
+  {
+    "id": "scen-16",
+    "title": "Dowry Death Within Seven Years",
+    "scenario": "A bride dies of burn injuries in her marital home 3 years after wedding following relentless harassment for a luxury car. Which section of BNS replaces IPC Section 304B?",
+    "options": [
+      "BNS Section 80",
+      "BNS Section 304B",
+      "BNS Section 102",
+      "BNS Section 64"
+    ],
+    "correctIndex": 0,
+    "bns_section": "80",
+    "ipc_section": "304B",
+    "explanation": "IPC Section 304B has been shifted to Chapter V as Section 80 of BNS with the same 7-year statutory presumption.",
+    "chapter": "Offences Against Women and Children"
+  },
+  {
+    "id": "scen-17",
+    "title": "Voyeurism via Hidden Cameras in Hotel",
+    "scenario": "A hotel operator installs a hidden camera in a guest bathroom to record private acts without consent. Which BNS section replaces IPC Section 354C for voyeurism?",
+    "options": [
+      "BNS Section 77",
+      "BNS Section 354",
+      "BNS Section 115",
+      "BNS Section 281"
+    ],
+    "correctIndex": 0,
+    "bns_section": "77",
+    "ipc_section": "354C",
+    "explanation": "Voyeurism moves from IPC Section 354C to BNS Section 77 without altering penal limits.",
+    "chapter": "Offences Against Women and Children"
+  },
+  {
+    "id": "scen-18",
+    "title": "Rash and Negligent Driving",
+    "scenario": "A driver speeds recklessly through a busy market at 90 km/h, endangering pedestrians. In IPC, this was registered under Section 279. Which section of BNS applies?",
+    "options": [
+      "BNS Section 281",
+      "BNS Section 279",
+      "BNS Section 106",
+      "BNS Section 141"
+    ],
+    "correctIndex": 0,
+    "bns_section": "281",
+    "ipc_section": "279",
+    "explanation": "Rash driving or riding on a public way moves from IPC Section 279 to Section 281 of BNS.",
+    "chapter": "Offences Affecting Public Health, Safety, and Decency"
+  },
+  {
+    "id": "scen-19",
+    "title": "Criminal Intimidation and Death Threats",
+    "scenario": "An extortionist calls a businessman and threatens to shoot his children if he does not pay money within 24 hours. Under IPC, this was Section 506. Under BNS, which section penalizes criminal intimidation?",
+    "options": [
+      "BNS Section 351(2)",
+      "BNS Section 506",
+      "BNS Section 308",
+      "BNS Section 189"
+    ],
+    "correctIndex": 0,
+    "bns_section": "351(2)",
+    "ipc_section": "506",
+    "explanation": "Criminal intimidation is defined in BNS Section 351(1) and punished under BNS Section 351(2).",
+    "chapter": "Defamation and Intimidation"
+  },
+  {
+    "id": "scen-20",
+    "title": "Hit and Run Escape",
+    "scenario": "A driver causes the death of a pedestrian through rash driving and immediately flees the scene without reporting to police or a magistrate. Under BNS Section 106(2), what is the maximum imprisonment he faces?",
+    "options": [
+      "Up to 2 years",
+      "Up to 5 years",
+      "Up to 10 years and fine",
+      "Life imprisonment"
+    ],
+    "correctIndex": 2,
+    "bns_section": "106(2)",
+    "ipc_section": "304A",
+    "explanation": "BNS Section 106(2) creates a dedicated aggravated hit-and-run offence carrying imprisonment up to 10 years and fine for escaping after causing death.",
+    "chapter": "Offences Affecting the Human Body"
+  }
+]

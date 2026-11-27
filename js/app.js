@@ -1,10 +1,11 @@
 /**
- * Application Bootstrap for BNS Mapper
- * Loads dataset, initializes search, routing, theme, and direction switches
+ * Application Bootstrap for BNS Mapper (Extended Round 2)
+ * Loads multi-statute datasets, initializes quiz engine, PWA service worker, and routing
  */
 
-import { storage, DIRECTIONS } from './storage.js';
+import { storage, DIRECTIONS, STATUTES } from './storage.js';
 import { searchEngine } from './search.js';
+import { quizEngine } from './quiz.js';
 import { Router } from './router.js';
 import { ui } from './ui.js';
 
@@ -18,30 +19,50 @@ async function bootstrap() {
   const container = document.getElementById('app');
   ui.init(container);
 
-  // 3. Fetch dataset via relative path for GitHub Pages compatibility
-  let sections = [];
+  // 3. Register Service Worker for PWA Offline Support
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').then((reg) => {
+        console.log('BNS Mapper Service Worker registered:', reg.scope);
+      }).catch((err) => {
+        console.warn('Service Worker registration skipped/failed:', err);
+      });
+    });
+  }
+
+  // 4. Fetch all datasets via relative paths
+  let ipcSections = [], bnssSections = [], bsaSections = [], quizScenarios = [];
   try {
-    const res = await fetch('./data/sections.json');
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
-    }
-    sections = await res.json();
+    const [ipcRes, bnssRes, bsaRes, scenRes] = await Promise.all([
+      fetch('./data/sections.json'),
+      fetch('./data/bnss_sections.json').catch(() => ({ ok: false })),
+      fetch('./data/bsa_sections.json').catch(() => ({ ok: false })),
+      fetch('./data/quiz_scenarios.json').catch(() => ({ ok: false }))
+    ]);
+
+    if (!ipcRes.ok) throw new Error(`HTTP ${ipcRes.status} loading sections.json`);
+    ipcSections = await ipcRes.json();
+    if (bnssRes.ok) bnssSections = await bnssRes.json();
+    if (bsaRes.ok) bsaSections = await bsaRes.json();
+    if (scenRes.ok) quizScenarios = await scenRes.json();
   } catch (err) {
-    console.error('Failed to load sections data:', err);
+    console.error('Failed to load law data:', err);
     container.innerHTML = `
       <div class="empty-state" style="margin-top: 50px;">
         <h2>Error Loading Law Data</h2>
-        <p>Could not fetch <code>./data/sections.json</code>. If running locally, please use a local web server (e.g., <code>npx serve</code> or VSCode Live Server) to allow JSON fetch.</p>
+        <p>Could not load legal datasets. If running locally, please serve through an HTTP server (e.g. <code>npx serve</code>).</p>
       </div>
     `;
     return;
   }
 
-  // 4. Initialize Search Engine
+  // 5. Initialize Search & Quiz Engines
   const currentDirection = storage.getDirection();
-  searchEngine.init(sections, currentDirection);
+  const currentStatute = storage.getActiveStatute();
+  searchEngine.init(ipcSections, bnssSections, bsaSections, currentDirection, currentStatute);
+  quizEngine.init(searchEngine.getAllSectionsCombined(), quizScenarios);
 
-  // 5. Setup Router
+  // 6. Setup Router with Extended Routes
   appRouter = new Router();
 
   appRouter
@@ -59,12 +80,24 @@ async function bootstrap() {
     })
     .addRoute('#/bookmarks', () => {
       ui.renderBookmarksView();
+    })
+    .addRoute('#/quiz', (params, query) => {
+      ui.renderQuizView({ mode: query.mode || 'mixed', chapter: query.chapter || 'all', difficulty: query.diff || 'medium' });
+    })
+    .addRoute('#/flashcards', () => {
+      ui.renderFlashcardsView();
+    })
+    .addRoute('#/whats-new', () => {
+      ui.renderWhatsNew();
+    })
+    .addRoute('#/compare', () => {
+      ui.renderCompareView();
     });
 
-  // 6. Bind Global Header Controls
+  // 7. Bind Global Header Controls (Statute Switcher, Direction Switcher, Theme Toggle)
   bindGlobalControls();
 
-  // 7. Initial routing handle
+  // 8. Initial routing handle
   appRouter.handleRouting();
 }
 
@@ -79,7 +112,6 @@ function bindGlobalControls() {
     if (current === 'light') next = 'dark';
     else if (current === 'dark') next = 'light';
     else {
-      // If auto, flip based on current effective
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       next = isDark ? 'light' : 'dark';
     }
@@ -101,6 +133,44 @@ function bindGlobalControls() {
     });
   }
   updateThemeIcon();
+
+  // Statute Switcher Tabs (IPC/BNS vs CrPC/BNSS vs IEA/BSA)
+  const statuteBtns = document.querySelectorAll('.statute-tab-btn');
+  const updateStatuteUI = (activeStatute) => {
+    statuteBtns.forEach(b => {
+      const s = b.getAttribute('data-statute');
+      if (s === activeStatute) {
+        b.classList.add('active');
+        b.setAttribute('aria-pressed', 'true');
+      } else {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      }
+    });
+  };
+
+  updateStatuteUI(storage.getActiveStatute());
+
+  statuteBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const s = btn.getAttribute('data-statute');
+      storage.setActiveStatute(s);
+      searchEngine.setStatute(s);
+      updateStatuteUI(s);
+
+      let label = 'IPC ↔ BNS';
+      if (s === STATUTES.CRPC_BNSS) label = 'CrPC ↔ BNSS';
+      else if (s === STATUTES.IEA_BSA) label = 'IEA ↔ BSA';
+      ui.showToast(`Active Statute: ${label}`);
+
+      const hash = window.location.hash || '#/';
+      if (hash === '#/' || hash.startsWith('#/search')) {
+        ui.renderSearchView({ query: ui.lastSearchQuery, filterChange: ui.activeFilterChange });
+      } else if (hash.startsWith('#/chapters')) {
+        ui.renderChaptersView();
+      }
+    });
+  });
 
   // Direction Switcher (IPC -> BNS vs BNS -> IPC)
   const dirBtns = document.querySelectorAll('.direction-btn');
@@ -125,14 +195,14 @@ function bindGlobalControls() {
       storage.setDirection(dir);
       searchEngine.setDirection(dir);
       updateDirectionUI(dir);
-      ui.showToast(`Mapping direction: ${dir === DIRECTIONS.IPC_TO_BNS ? 'IPC → BNS' : 'BNS → IPC'}`);
+      ui.showToast(`Mapping direction: ${dir === DIRECTIONS.IPC_TO_BNS ? 'Old → New' : 'New → Old'}`);
 
-      // Re-render current view if on search or chapters
-      if (!window.location.hash || window.location.hash === '#/' || window.location.hash.startsWith('#/search')) {
+      const hash = window.location.hash || '#/';
+      if (hash === '#/' || hash.startsWith('#/search')) {
         ui.renderSearchView({ query: ui.lastSearchQuery, filterChange: ui.activeFilterChange });
-      } else if (window.location.hash.startsWith('#/chapters')) {
+      } else if (hash.startsWith('#/chapters')) {
         ui.renderChaptersView();
-      } else if (window.location.hash.startsWith('#/bookmarks')) {
+      } else if (hash.startsWith('#/bookmarks')) {
         ui.renderBookmarksView();
       }
     });
@@ -140,7 +210,6 @@ function bindGlobalControls() {
 
   // Global Keyboard Shortcuts
   window.addEventListener('keydown', (e) => {
-    // '/' key opens and focuses search bar when not typing in an input
     if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
       e.preventDefault();
       const searchInput = document.getElementById('search-input');
@@ -152,11 +221,10 @@ function bindGlobalControls() {
         setTimeout(() => {
           const input = document.getElementById('search-input');
           if (input) input.focus();
-        }, 100);
+        }, 120);
       }
     }
 
-    // Esc clears search or defocuses
     if (e.key === 'Escape') {
       const searchInput = document.getElementById('search-input');
       if (searchInput && document.activeElement === searchInput) {
@@ -171,5 +239,5 @@ function bindGlobalControls() {
   });
 }
 
-// Start app
+// Launch
 bootstrap();

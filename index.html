@@ -4,8 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BNS Mapper — IPC to BNS Law Navigator</title>
-  <meta name="description" content="Instant search and side-by-side transition mapper from the Indian Penal Code (IPC 1860) to Bharatiya Nyaya Sanhita (BNS 2023) for law students and practitioners in India." />
+  <meta name="description" content="Instant search and side-by-side transition mapper from IPC, CrPC, and Evidence Act to Bharatiya Nyaya Sanhita (BNS 2023), BNSS, and BSA for law students in India." />
+  <meta name="theme-color" content="#883B1B" />
   <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+  <link rel="apple-touch-icon" href="./assets/favicon.svg" />
+  <link rel="manifest" href="./manifest.json" />
 
   <!-- Stylesheets -->
   <link rel="stylesheet" href="./css/main.css" />
@@ -36,9 +39,22 @@
           <img src="./assets/favicon.svg" alt="" class="brand-logo" width="32" height="32" />
           <div class="brand-text">
             <h1>BNS Mapper</h1>
-            <span class="brand-tagline">IPC &harr; BNS Criminal Law Navigator</span>
+            <span class="brand-tagline">Criminal Laws Navigator</span>
           </div>
         </a>
+      </div>
+
+      <!-- Statute Switcher Tabs (IPC/BNS vs CrPC/BNSS vs IEA/BSA) -->
+      <div class="statute-tabs" role="tablist" aria-label="Active Statute Pair">
+        <button type="button" class="statute-tab-btn active" data-statute="ipc_bns" role="tab" aria-selected="true" aria-pressed="true">
+          IPC &harr; BNS
+        </button>
+        <button type="button" class="statute-tab-btn" data-statute="crpc_bnss" role="tab" aria-selected="false" aria-pressed="false">
+          CrPC &harr; BNSS
+        </button>
+        <button type="button" class="statute-tab-btn" data-statute="iea_bsa" role="tab" aria-selected="false" aria-pressed="false">
+          IEA &harr; BSA
+        </button>
       </div>
 
       <!-- Two-Way Direction Toggle -->
@@ -48,18 +64,18 @@
           class="direction-btn active"
           data-direction="ipc-to-bns"
           aria-pressed="true"
-          title="Map from IPC to BNS"
+          title="Map from Old to New Code"
         >
-          IPC &rarr; BNS
+          Old &rarr; New
         </button>
         <button
           type="button"
           class="direction-btn"
           data-direction="bns-to-ipc"
           aria-pressed="false"
-          title="Map from BNS to IPC"
+          title="Map from New to Old Code"
         >
-          BNS &rarr; IPC
+          New &rarr; Old
         </button>
       </div>
 
@@ -67,6 +83,9 @@
       <nav class="header-nav" aria-label="Main Navigation">
         <a href="#/" class="nav-link active" data-route-link>Search</a>
         <a href="#/chapters" class="nav-link" data-route-link>Chapters</a>
+        <a href="#/whats-new" class="nav-link" data-route-link>What's New</a>
+        <a href="#/quiz" class="nav-link" data-route-link>Quiz Mode</a>
+        <a href="#/compare" class="nav-link" data-route-link>Compare</a>
         <a href="#/bookmarks" class="nav-link" data-route-link>My Sections</a>
       </nav>
 
@@ -102,7 +121,6 @@
 
   <!-- Main Content App Mount Point -->
   <main id="app" class="main-content" role="main" tabindex="-1">
-    <!-- Populated dynamically by Router & UI -->
     <noscript>
       <div class="empty-state">
         <h2>JavaScript Required</h2>
@@ -127,6 +145,20 @@
       </svg>
       <span>Chapters</span>
     </a>
+    <a href="#/quiz" class="bottom-nav-item" data-route-link aria-label="Practice Quiz">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+      <span>Quiz</span>
+    </a>
+    <a href="#/compare" class="bottom-nav-item" data-route-link aria-label="Compare Sections">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M16 12V4a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v8l-2 3v2h6v5l1 1 1-1v-5h6v-2l-2-3z"></path>
+      </svg>
+      <span>Compare</span>
+    </a>
     <a href="#/bookmarks" class="bottom-nav-item" data-route-link aria-label="Saved Bookmarks">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
@@ -150,10 +182,10 @@
   <footer class="site-footer" role="contentinfo">
     <div class="footer-content">
       <div>
-        <strong>BNS Mapper</strong> &mdash; Educational legal transition tool for the Indian Penal Code &amp; Bharatiya Nyaya Sanhita.
+        <strong>BNS Mapper</strong> &mdash; Educational study aid for IPC, BNS, CrPC, BNSS, IEA, and BSA.
       </div>
       <div>
-        Designed for law students in India &bull; Hosted on GitHub Pages
+        Not legal advice &bull; Verified against the Gazette of India &bull; Open Source on GitHub
       </div>
     </div>
   </footer>

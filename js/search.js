@@ -1,38 +1,55 @@
 /**
  * Search module for BNS Mapper
- * Powered by Fuse.js with direction-aware weighting and exact section boost
+ * Powered by Fuse.js with direction-aware weighting and multi-statute support
  */
 
-import { DIRECTIONS } from './storage.js';
+import { DIRECTIONS, STATUTES } from './storage.js';
 
 let fuseInstance = null;
-let allSections = [];
+let currentStatute = STATUTES.IPC_BNS;
 let currentDirection = DIRECTIONS.IPC_TO_BNS;
+const datasets = {
+  [STATUTES.IPC_BNS]: [],
+  [STATUTES.CRPC_BNSS]: [],
+  [STATUTES.IEA_BSA]: []
+};
 
 export const searchEngine = {
-  init(sections, direction = DIRECTIONS.IPC_TO_BNS) {
-    allSections = sections;
+  init(ipcSections, bnssSections = [], bsaSections = [], direction = DIRECTIONS.IPC_TO_BNS, statute = STATUTES.IPC_BNS) {
+    datasets[STATUTES.IPC_BNS] = ipcSections || [];
+    datasets[STATUTES.CRPC_BNSS] = bnssSections || [];
+    datasets[STATUTES.IEA_BSA] = bsaSections || [];
     currentDirection = direction;
-    this.rebuildIndex(direction);
+    currentStatute = statute;
+    this.rebuildIndex();
+  },
+
+  setStatute(statute) {
+    if (datasets[statute]) {
+      currentStatute = statute;
+      this.rebuildIndex();
+    }
+  },
+
+  getStatute() {
+    return currentStatute;
   },
 
   setDirection(direction) {
     if (currentDirection !== direction) {
       currentDirection = direction;
-      this.rebuildIndex(direction);
+      this.rebuildIndex();
     }
   },
 
-  rebuildIndex(direction) {
+  rebuildIndex() {
     if (!window.Fuse) {
       console.warn('Fuse.js not found in global window scope.');
       return;
     }
 
-    // Configure keys and weights based on active direction
-    // If IPC -> BNS: IPC number gets highest priority
-    // If BNS -> IPC: BNS number gets highest priority
-    const keys = direction === DIRECTIONS.BNS_TO_IPC
+    const activeList = datasets[currentStatute] || [];
+    const keys = currentDirection === DIRECTIONS.BNS_TO_IPC
       ? [
           { name: 'bns', weight: 0.45 },
           { name: 'title', weight: 0.25 },
@@ -48,7 +65,7 @@ export const searchEngine = {
           { name: 'explanation', weight: 0.05 }
         ];
 
-    fuseInstance = new window.Fuse(allSections, {
+    fuseInstance = new window.Fuse(activeList, {
       keys,
       threshold: 0.35,
       distance: 100,
@@ -59,21 +76,19 @@ export const searchEngine = {
   },
 
   search(query, { filterChange = 'all', chapter = 'all' } = {}) {
+    const activeList = datasets[currentStatute] || [];
     const trimmed = (query || '').trim();
     let results = [];
 
     if (!trimmed) {
-      // No query: return all sections
-      results = allSections.slice();
+      results = activeList.slice();
     } else {
-      // 1. Direct exact or prefix section number match boost
       const cleanNum = trimmed.replace(/[^0-9a-zA-Z()]/g, '').toLowerCase();
       const directMatches = [];
       const primaryKey = currentDirection === DIRECTIONS.BNS_TO_IPC ? 'bns' : 'ipc';
       const secondaryKey = currentDirection === DIRECTIONS.BNS_TO_IPC ? 'ipc' : 'bns';
 
-      // Check if user typed an exact or prefix section number
-      for (const item of allSections) {
+      for (const item of activeList) {
         const pVal = (item[primaryKey] || '').toLowerCase().replace(/[^0-9a-zA-Z()]/g, '');
         const sVal = (item[secondaryKey] || '').toLowerCase().replace(/[^0-9a-zA-Z()]/g, '');
 
@@ -84,10 +99,7 @@ export const searchEngine = {
         }
       }
 
-      // 2. Fuzzy search via Fuse
       const fuseResults = fuseInstance ? fuseInstance.search(trimmed) : [];
-
-      // Combine direct matches and fuzzy results without duplicates
       const seenIds = new Set();
       results = [];
 
@@ -106,12 +118,10 @@ export const searchEngine = {
       }
     }
 
-    // Apply change type filter
     if (filterChange && filterChange !== 'all') {
       results = results.filter(item => item.change === filterChange);
     }
 
-    // Apply chapter filter
     if (chapter && chapter !== 'all') {
       results = results.filter(item => item.chapter === chapter);
     }
@@ -120,23 +130,29 @@ export const searchEngine = {
   },
 
   getAllSections() {
-    return allSections;
+    return datasets[currentStatute] || [];
+  },
+
+  getAllSectionsCombined() {
+    return [
+      ...datasets[STATUTES.IPC_BNS],
+      ...datasets[STATUTES.CRPC_BNSS],
+      ...datasets[STATUTES.IEA_BSA]
+    ];
   },
 
   getSectionById(idOrNumber) {
     if (!idOrNumber) return null;
     const clean = idOrNumber.toString().trim().toLowerCase();
+    const combined = this.getAllSectionsCombined();
 
-    // 1. Exact ID match (e.g., "ipc-302")
-    let found = allSections.find(s => s.id.toLowerCase() === clean);
+    let found = combined.find(s => s.id.toLowerCase() === clean);
     if (found) return found;
 
-    // 2. Exact IPC number match (e.g., "302" or "304b")
-    found = allSections.find(s => s.ipc.toLowerCase() === clean);
+    found = combined.find(s => s.ipc.toLowerCase() === clean);
     if (found) return found;
 
-    // 3. Exact BNS number match (e.g., "103" or "103(1)")
-    found = allSections.find(s => s.bns.toLowerCase() === clean || s.bns.toLowerCase().startsWith(clean));
+    found = combined.find(s => s.bns.toLowerCase() === clean || s.bns.toLowerCase().startsWith(clean));
     if (found) return found;
 
     return null;

@@ -1,6 +1,6 @@
 /**
  * Hash Router for BNS Mapper
- * Enables deep linking on GitHub Pages without server-side routing (#/section/302, #/chapters, #/bookmarks)
+ * Enables deep linking on GitHub Pages without server-side routing
  */
 
 export class Router {
@@ -13,7 +13,6 @@ export class Router {
   }
 
   addRoute(pattern, handler) {
-    // Convert pattern like '#/section/:id' to regex and param names
     const paramNames = [];
     const regexPath = pattern
       .replace(/:([a-zA-Z0-9_-]+)/g, (_, paramName) => {
@@ -40,7 +39,6 @@ export class Router {
       hash = '#/';
     }
 
-    // Split path and query
     const [pathWithHash, queryString] = hash.split('?');
     const queryParams = new URLSearchParams(queryString || '');
 
@@ -66,11 +64,11 @@ export class Router {
     }
 
     if (!matched) {
-      // Default fallback to home
       this.navigate('#/');
     }
 
     this.updateActiveNavLinks(pathWithHash);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   updateActiveNavLinks(activeHash) {
