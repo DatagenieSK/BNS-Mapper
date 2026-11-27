@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="14" fill="#8B4513" />
+  <rect x="3" y="3" width="58" height="58" rx="11" fill="#FDFBF7" />
+  <!-- Scales / Pillar Emblem -->
+  <path d="M32 14V48" stroke="#2C1810" stroke-width="3" stroke-linecap="round"/>
+  <path d="M20 20H44" stroke="#2C1810" stroke-width="3" stroke-linecap="round"/>
+  <path d="M20 20L14 32H26L20 20Z" fill="#C49A45" stroke="#2C1810" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M44 20L38 32H50L44 20Z" fill="#C49A45" stroke="#2C1810" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M22 48H42" stroke="#2C1810" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="32" cy="14" r="3" fill="#8B4513"/>
+</svg>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BNS Mapper — IPC to BNS Law Navigator</title>
+  <meta name="description" content="Instant search and side-by-side transition mapper from the Indian Penal Code (IPC 1860) to Bharatiya Nyaya Sanhita (BNS 2023) for law students and practitioners in India." />
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="./css/main.css" />
+  <link rel="stylesheet" href="./css/print.css" media="print" />
+
+  <!-- Fuse.js pinned version from cdnjs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/7.0.0/fuse.min.js"></script>
+</head>
+<body>
+  <!-- Accessible Skip Link -->
+  <a href="#app" class="skip-link">Skip to main content</a>
+
+  <!-- Disclaimer Banner -->
+  <aside class="disclaimer-banner" role="alert" aria-label="Sample data notice">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/>
+      <line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+    <span>Sample data &mdash; verify against the official gazette before relying on it.</span>
+  </aside>
+
+  <!-- Site Header -->
+  <header class="site-header" role="banner">
+    <div class="header-container">
+      <div class="brand-group">
+        <a href="#/" class="brand-link" aria-label="BNS Mapper Home">
+          <img src="./assets/favicon.svg" alt="" class="brand-logo" width="32" height="32" />
+          <div class="brand-text">
+            <h1>BNS Mapper</h1>
+            <span class="brand-tagline">IPC &harr; BNS Criminal Law Navigator</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Two-Way Direction Toggle -->
+      <div class="direction-toggle" role="group" aria-label="Conversion mapping direction">
+        <button
+          type="button"
+          class="direction-btn active"
+          data-direction="ipc-to-bns"
+          aria-pressed="true"
+          title="Map from IPC to BNS"
+        >
+          IPC &rarr; BNS
+        </button>
+        <button
+          type="button"
+          class="direction-btn"
+          data-direction="bns-to-ipc"
+          aria-pressed="false"
+          title="Map from BNS to IPC"
+        >
+          BNS &rarr; IPC
+        </button>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <nav class="header-nav" aria-label="Main Navigation">
+        <a href="#/" class="nav-link active" data-route-link>Search</a>
+        <a href="#/chapters" class="nav-link" data-route-link>Chapters</a>
+        <a href="#/bookmarks" class="nav-link" data-route-link>My Sections</a>
+      </nav>
+
+      <!-- Header Action Controls -->
+      <div class="header-actions">
+        <button
+          type="button"
+          id="theme-toggle-btn"
+          class="icon-btn"
+          title="Toggle light/dark theme"
+          aria-label="Toggle light and dark theme"
+        >
+          <!-- Sun Icon (shown in dark theme) -->
+          <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <!-- Moon Icon (shown in light theme) -->
+          <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content App Mount Point -->
+  <main id="app" class="main-content" role="main" tabindex="-1">
+    <!-- Populated dynamically by Router & UI -->
+    <noscript>
+      <div class="empty-state">
+        <h2>JavaScript Required</h2>
+        <p>BNS Mapper relies on client-side JavaScript for offline instant search and interactive legal mapping.</p>
+      </div>
+    </noscript>
+  </main>
+
+  <!-- Mobile Bottom Navigation Bar -->
+  <nav class="bottom-nav" aria-label="Mobile Navigation">
+    <a href="#/" class="bottom-nav-item active" data-route-link aria-label="Search and Explore">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <span>Search</span>
+    </a>
+    <a href="#/chapters" class="bottom-nav-item" data-route-link aria-label="Browse Chapters">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+      </svg>
+      <span>Chapters</span>
+    </a>
+    <a href="#/bookmarks" class="bottom-nav-item" data-route-link aria-label="Saved Bookmarks">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+      </svg>
+      <span>Saved</span>
+    </a>
+    <button type="button" id="bottom-theme-toggle-btn" class="bottom-nav-item" aria-label="Toggle Theme">
+      <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+      <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;" aria-hidden="true">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+      </svg>
+      <span>Theme</span>
+    </button>
+  </nav>
+
+  <!-- Site Footer -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-content">
+      <div>
+        <strong>BNS Mapper</strong> &mdash; Educational legal transition tool for the Indian Penal Code &amp; Bharatiya Nyaya Sanhita.
+      </div>
+      <div>
+        Designed for law students in India &bull; Hosted on GitHub Pages
+      </div>
+    </div>
+  </footer>
+
+  <!-- App Bootstrap Module -->
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
