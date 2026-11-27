@@ -146,39 +146,70 @@ async function bootstrap() {
   searchEngine.init(ipcSections, bnssSections, bsaSections, currentDirection, currentStatute);
   quizEngine.init(searchEngine.getAllSectionsCombined(), quizScenarios);
 
-  // Setup Router with deep-linking & View Transitions
+  // Setup Router with deep-linking, query synchronization & View Transitions
   appRouter = new Router();
+  ui.setRouter(appRouter);
 
   appRouter
-    .addRoute('#/', () => {
-      ui.renderSearchView({ query: '', filterChange: 'all' });
+    .addRoute('#/', (params, query) => {
+      ui.renderSearchView({
+        query: query.q || '',
+        filterChange: query.filter || 'all',
+        page: query.page,
+        size: query.size,
+        style: query.style
+      });
     })
     .addRoute('#/search', (params, query) => {
-      ui.renderSearchView({ query: query.q || '', filterChange: query.filter || 'all' });
+      ui.renderSearchView({
+        query: query.q || '',
+        filterChange: query.filter || 'all',
+        page: query.page,
+        size: query.size,
+        style: query.style
+      });
+    })
+    .addRoute('#/sections', (params, query) => {
+      ui.renderSearchView({
+        query: query.q || '',
+        filterChange: query.filter || 'all',
+        page: query.page,
+        size: query.size,
+        style: query.style
+      });
     })
     .addRoute('#/section/:id', (params) => {
       ui.renderSectionDetail(params.id);
     })
     .addRoute('#/chapters', (params, query) => {
-      ui.renderChaptersView({ filterChange: query.filter || 'all' });
+      ui.renderChaptersView(query);
     })
-    .addRoute('#/bookmarks', () => {
-      ui.renderBookmarksView();
+    .addRoute('#/chapters/:chapter', (params, query) => {
+      ui.renderChapterDetailView(params.chapter, query);
+    })
+    .addRoute('#/bookmarks', (params, query) => {
+      ui.renderBookmarksView(query);
     })
     .addRoute('#/quiz', (params, query) => {
-      ui.renderQuizView({ mode: query.mode || 'mixed', chapter: query.chapter || 'all', difficulty: query.diff || 'medium' });
+      ui.renderQuizView({
+        mode: query.mode || 'mixed',
+        chapter: query.chapter || 'all',
+        difficulty: query.diff || 'medium',
+        page: query.page,
+        size: query.size
+      });
     })
     .addRoute('#/flashcards', () => {
       ui.renderFlashcardsView();
     })
-    .addRoute('#/whats-new', () => {
-      ui.renderWhatsNew();
+    .addRoute('#/whats-new', (params, query) => {
+      ui.renderWhatsNew(query);
     })
     .addRoute('#/compare', () => {
       ui.renderCompareView();
     })
-    .addRoute('#/coverage', () => {
-      ui.renderCoverageView();
+    .addRoute('#/coverage', (params, query) => {
+      ui.renderCoverageView(query);
     });
 
   bindGlobalControls();

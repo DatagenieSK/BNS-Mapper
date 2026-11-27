@@ -1,5 +1,5 @@
 /**
- * Hash Router for BNS Mapper with View Transitions API & Scroll Preservation
+ * Hash Router for BNS Mapper with View Transitions API, Query Param Synchronization & Scroll Preservation
  * Enables deep linking on GitHub Pages without server-side routing
  */
 
@@ -36,6 +36,38 @@ export class Router {
     window.location.hash = path;
   }
 
+  /**
+   * Updates current route's query parameters without losing base route.
+   * If replace is true, uses history.replaceState and re-runs routing.
+   */
+  updateQueryParams(newParams = {}, { replace = false } = {}) {
+    let hash = window.location.hash || '#/';
+    const [basePath, queryString] = hash.split('?');
+    const params = new URLSearchParams(queryString || '');
+
+    Object.entries(newParams).forEach(([key, val]) => {
+      if (val === null || val === undefined || val === '') {
+        params.delete(key);
+      } else {
+        params.set(key, String(val));
+      }
+    });
+
+    const queryStr = params.toString();
+    const newHash = queryStr ? `${basePath}?${queryStr}` : basePath;
+
+    if (replace) {
+      if (window.location.hash !== newHash) {
+        history.replaceState(null, '', newHash);
+        this.handleRouting();
+      }
+    } else {
+      if (window.location.hash !== newHash) {
+        window.location.hash = newHash;
+      }
+    }
+  }
+
   handleRouting() {
     let hash = window.location.hash || '#/';
     if (!hash.startsWith('#/')) {
@@ -46,20 +78,24 @@ export class Router {
     const queryParams = new URLSearchParams(queryString || '');
 
     // Save scroll position for previous route
-    if (this.currentRoute && this.currentRoute.path) {
+    if (this.currentRoute) {
+      const prevFullHash = this.currentRoute.fullHash || this.currentRoute.path;
+      this.scrollPositions.set(prevFullHash, window.scrollY);
       this.scrollPositions.set(this.currentRoute.path, window.scrollY);
     }
 
     // Determine navigation direction (forward vs back)
     let isBack = false;
-    if (this.historyStack.length >= 2 && this.historyStack[this.historyStack.length - 2] === pathWithHash) {
+    if (this.historyStack.length >= 2 && this.historyStack[this.historyStack.length - 2] === hash) {
       isBack = true;
-      this.historyStack.pop(); // Pop current
+      this.historyStack.pop();
+    } else if (this.historyStack.length >= 2 && this.historyStack[this.historyStack.length - 2] === pathWithHash) {
+      isBack = true;
+      this.historyStack.pop();
     } else {
       isBack = false;
-      // Prevent consecutive duplicates
-      if (this.historyStack[this.historyStack.length - 1] !== pathWithHash) {
-        this.historyStack.push(pathWithHash);
+      if (this.historyStack[this.historyStack.length - 1] !== hash) {
+        this.historyStack.push(hash);
       }
     }
 
@@ -68,6 +104,7 @@ export class Router {
       this.historyStack.shift();
     }
 
+    const isSameBasePath = Boolean(this.currentRoute && this.currentRoute.path === pathWithHash);
     const direction = isBack ? 'back' : 'forward';
     document.documentElement.dataset.transitionDirection = direction;
 
@@ -82,6 +119,7 @@ export class Router {
 
         const nextRoute = {
           path: pathWithHash,
+          fullHash: hash,
           params,
           queryParams: Object.fromEntries(queryParams.entries())
         };
@@ -89,12 +127,13 @@ export class Router {
         const renderRoute = () => {
           this.currentRoute = nextRoute;
           route.handler(params, nextRoute.queryParams);
-          this.afterNavigation(pathWithHash, isBack);
+          this.afterNavigation(pathWithHash, isBack, isSameBasePath);
         };
 
         const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        if (document.startViewTransition && !prefersReducedMotion) {
+        // Skip view transition for pure in-page pagination updates to keep < 250ms feel
+        if (document.startViewTransition && !prefersReducedMotion && !isSameBasePath) {
           document.startViewTransition(() => {
             renderRoute();
           });
@@ -112,18 +151,22 @@ export class Router {
     }
   }
 
-  afterNavigation(activeHash, isBack) {
+  afterNavigation(activeHash, isBack, isSameBasePath) {
     this.updateActiveNavLinks(activeHash);
 
-    // Scroll restoration: restore scroll if back navigation, else reset to top
-    if (isBack && this.scrollPositions.has(activeHash)) {
-      const savedY = this.scrollPositions.get(activeHash) || 0;
+    const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Scroll restoration: restore scroll if back navigation
+    if (isBack) {
+      const currentHash = window.location.hash;
+      const savedY = this.scrollPositions.get(currentHash) ?? this.scrollPositions.get(activeHash) ?? 0;
       requestAnimationFrame(() => {
         window.scrollTo({ top: savedY, behavior: 'instant' in window ? 'instant' : 'auto' });
       });
-    } else {
+    } else if (!isSameBasePath) {
+      // New top-level navigation: reset to top
       requestAnimationFrame(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
       });
     }
 

@@ -1,22 +1,48 @@
 /**
- * UI Renderer for BNS Mapper (Round 1 Upgrade)
+ * UI Renderer for BNS Mapper (Round 1 Upgrade & Pagination Elevation)
  * Supports multi-section array mappings (e.g., "IPC 300 + 302 -> BNS 103"),
- * chapters index metadata, quiz, Leitner flashcards, compare mode & What's New.
+ * chapters index metadata, quiz, Leitner flashcards, compare mode, What's New, and pagination.
  */
 
 import { storage, DIRECTIONS, STATUTES } from './storage.js';
 import { searchEngine } from './search.js';
 import { quizEngine } from './quiz.js';
+import {
+  getPageCount,
+  clampPage,
+  getSliceBounds,
+  sliceArray,
+  generateEllipsis,
+  getResultSummary,
+  calculatePageForNewPageSize,
+  getStoredPageSize,
+  setStoredPageSize,
+  getStoredPaginationStyle,
+  setStoredPaginationStyle,
+  renderPaginationHtml,
+  bindPaginationEvents,
+  announcePaginationChange
+} from './pagination.js';
 
 export const ui = {
   appContainer: null,
+  router: null,
   activeFilterChange: 'all',
   lastSearchQuery: '',
   morphTimer: null,
   chaptersIndex: [],
+  currentPage: 1,
+  pageSize: 20,
+  paginationStyle: 'pages',
 
   init(containerEl) {
     this.appContainer = containerEl;
+    this.pageSize = getStoredPageSize();
+    this.paginationStyle = getStoredPaginationStyle();
+  },
+
+  setRouter(router) {
+    this.router = router;
   },
 
   setChaptersIndex(index) {
@@ -188,16 +214,29 @@ export const ui = {
   // -------------------------------------------------------------
   // View 1: Search & Explorer View
   // -------------------------------------------------------------
-  renderSearchView({ query = '', filterChange = 'all' } = {}) {
+  renderSearchView({ query = '', filterChange = 'all', page = 1, size = null, style = null } = {}) {
     document.title = 'BNS Mapper — Criminal Law Transition Navigator';
     this.activeFilterChange = filterChange;
     this.lastSearchQuery = query;
+
+    this.pageSize = size ? parseInt(size, 10) : getStoredPageSize();
+    this.paginationStyle = style || getStoredPaginationStyle();
 
     const direction = storage.getDirection();
     const isIpcToBns = direction === DIRECTIONS.IPC_TO_BNS;
     const currentStatute = searchEngine.getStatute();
     const allSections = searchEngine.getAllSections();
     const results = searchEngine.search(query, { filterChange });
+
+    const totalPages = getPageCount(results.length, this.pageSize);
+    this.currentPage = clampPage(page || 1, totalPages);
+
+    // If an out-of-bounds page was supplied in query string, clamp and update
+    if (page && parseInt(page, 10) !== this.currentPage) {
+      this.router?.updateQueryParams({ page: this.currentPage }, { replace: true });
+    }
+
+    const displayedResults = sliceArray(results, this.currentPage, this.pageSize, this.paginationStyle === 'loadMore');
 
     const counts = { all: allSections.length, renumbered: 0, modified: 0, new: 0, omitted: 0, split: 0, merged: 0 };
     allSections.forEach(s => { if (counts[s.change] !== undefined) counts[s.change]++; });
@@ -333,9 +372,9 @@ export const ui = {
       ` : ''}
 
       <section class="results-section" aria-live="polite">
-        <div class="results-meta-bar">
+        <div class="results-meta-bar" id="results-heading">
           <span class="results-count">
-            Showing <strong>${results.length}</strong> ${results.length === 1 ? 'provision' : 'provisions'}
+            ${getResultSummary(this.currentPage, this.pageSize, results.length, 'provisions', this.paginationStyle === 'loadMore')}
             ${filterChange !== 'all' ? `marked <em>${filterChange}</em>` : ''}
           </span>
           <div style="display: flex; gap: 12px; font-size: 0.85rem;">
@@ -355,8 +394,18 @@ export const ui = {
             <p>Try searching with a section number like <strong>4</strong>, <strong>14</strong>, <strong>34</strong>, <strong>302</strong>, or keywords like <strong>common intention</strong>, <strong>private defence</strong>, <strong>mistake of fact</strong>.</p>
           </div>
         ` : `
-          <div class="sections-grid">
-            ${results.map(item => this.renderSectionCard(item, direction, query)).join('')}
+          <div class="sections-grid page-crossfade">
+            ${displayedResults.map(item => this.renderSectionCard(item, direction, query)).join('')}
+          </div>
+          <div id="search-pagination-container">
+            ${renderPaginationHtml({
+              currentPage: this.currentPage,
+              totalPages,
+              totalItems: results.length,
+              pageSize: this.pageSize,
+              paginationStyle: this.paginationStyle,
+              itemLabel: 'provisions'
+            })}
           </div>
         `}
       </section>
@@ -524,7 +573,13 @@ export const ui = {
       input.addEventListener('input', (e) => {
         const val = e.target.value;
         this.lastSearchQuery = val;
+        this.currentPage = 1;
         clearBtn.classList.toggle('visible', !!val);
+
+        if (this.searchDebounce) clearTimeout(this.searchDebounce);
+        this.searchDebounce = setTimeout(() => {
+          this.router?.updateQueryParams({ q: val || null, page: 1 }, { replace: true });
+        }, 220);
 
         const direction = storage.getDirection();
         const results = searchEngine.search(val, { filterChange: this.activeFilterChange });
@@ -536,8 +591,10 @@ export const ui = {
       clearBtn.addEventListener('click', () => {
         input.value = '';
         this.lastSearchQuery = '';
+        this.currentPage = 1;
         clearBtn.classList.remove('visible');
         input.focus();
+        this.router?.updateQueryParams({ q: null, page: 1 });
         const direction = storage.getDirection();
         const results = searchEngine.search('', { filterChange: this.activeFilterChange });
         this.updateSearchResultsGrid(results, direction, '');
@@ -548,6 +605,7 @@ export const ui = {
       btn.addEventListener('click', () => {
         const filter = btn.getAttribute('data-filter');
         this.activeFilterChange = filter;
+        this.currentPage = 1;
         document.querySelectorAll('.filter-pill').forEach(b => {
           b.classList.remove('active');
           b.setAttribute('aria-checked', 'false');
@@ -555,6 +613,7 @@ export const ui = {
         btn.classList.add('active');
         btn.setAttribute('aria-checked', 'true');
 
+        this.router?.updateQueryParams({ filter: filter === 'all' ? null : filter, page: 1 });
         const direction = storage.getDirection();
         const results = searchEngine.search(this.lastSearchQuery, { filterChange: filter });
         this.updateSearchResultsGrid(results, direction, this.lastSearchQuery);
@@ -566,12 +625,15 @@ export const ui = {
         const term = chip.getAttribute('data-quick-search');
         if (input) {
           input.value = term;
+          this.currentPage = 1;
+          this.router?.updateQueryParams({ q: term, page: 1 });
           input.dispatchEvent(new Event('input'));
           input.focus();
         }
       });
     });
 
+    this.bindPagination('search', () => searchEngine.search(this.lastSearchQuery, { filterChange: this.activeFilterChange }));
     this.bindCardActions();
     this.initTypewriter();
     this.initCardTilt();
@@ -583,10 +645,13 @@ export const ui = {
     const resultsContainer = document.querySelector('.results-section');
     if (!resultsContainer) return;
 
+    const totalPages = getPageCount(results.length, this.pageSize);
+    this.currentPage = clampPage(this.currentPage, totalPages);
+
     if (metaBar) {
       metaBar.innerHTML = `
         <span class="results-count">
-          Showing <strong>${results.length}</strong> ${results.length === 1 ? 'provision' : 'provisions'}
+          ${getResultSummary(this.currentPage, this.pageSize, results.length, 'provisions', this.paginationStyle === 'loadMore')}
           ${this.activeFilterChange !== 'all' ? `marked <em>${this.activeFilterChange}</em>` : ''}
         </span>
         <div style="display: flex; gap: 12px; font-size: 0.85rem;">
@@ -598,9 +663,11 @@ export const ui = {
 
     const grid = resultsContainer.querySelector('.sections-grid');
     const empty = resultsContainer.querySelector('.empty-state');
+    let pagContainer = document.getElementById('search-pagination-container');
 
     if (results.length === 0) {
       if (grid) grid.remove();
+      if (pagContainer) pagContainer.innerHTML = '';
       if (!empty) {
         const emptyDiv = document.createElement('div');
         emptyDiv.className = 'empty-state';
@@ -620,13 +687,74 @@ export const ui = {
       let targetGrid = grid;
       if (!targetGrid) {
         targetGrid = document.createElement('div');
-        targetGrid.className = 'sections-grid';
+        targetGrid.className = 'sections-grid page-crossfade';
         resultsContainer.appendChild(targetGrid);
+      } else {
+        targetGrid.classList.remove('page-crossfade');
+        void targetGrid.offsetWidth; // Force reflow for smooth animation
+        targetGrid.classList.add('page-crossfade');
       }
-      targetGrid.innerHTML = results.map(item => this.renderSectionCard(item, direction, query)).join('');
+
+      const displayedResults = sliceArray(results, this.currentPage, this.pageSize, this.paginationStyle === 'loadMore');
+      targetGrid.innerHTML = displayedResults.map(item => this.renderSectionCard(item, direction, query)).join('');
+
+      if (!pagContainer) {
+        pagContainer = document.createElement('div');
+        pagContainer.id = 'search-pagination-container';
+        resultsContainer.appendChild(pagContainer);
+      }
+
+      pagContainer.innerHTML = renderPaginationHtml({
+        currentPage: this.currentPage,
+        totalPages,
+        totalItems: results.length,
+        pageSize: this.pageSize,
+        paginationStyle: this.paginationStyle,
+        itemLabel: 'provisions'
+      });
+
+      this.bindPagination('search', () => results);
       this.bindCardActions();
       this.initCardTilt();
+      announcePaginationChange(this.currentPage, totalPages, results.length, this.pageSize, 'provisions');
     }
+  },
+
+  bindPagination(type, getResultsFn) {
+    const container = document.getElementById(`${type}-pagination-container`);
+    if (!container) return;
+
+    bindPaginationEvents(container, {
+      onPageChange: (newPage) => {
+        this.currentPage = newPage;
+        this.router?.updateQueryParams({ page: newPage });
+        const direction = storage.getDirection();
+        const results = getResultsFn ? getResultsFn() : [];
+        this.updateSearchResultsGrid(results, direction, this.lastSearchQuery);
+      },
+      onPageSizeChange: (newSize) => {
+        const newPage = calculatePageForNewPageSize(this.currentPage, this.pageSize, newSize);
+        this.pageSize = newSize;
+        this.currentPage = newPage;
+        this.router?.updateQueryParams({ size: newSize, page: newPage });
+        const direction = storage.getDirection();
+        const results = getResultsFn ? getResultsFn() : [];
+        this.updateSearchResultsGrid(results, direction, this.lastSearchQuery);
+      },
+      onStyleChange: (newStyle) => {
+        this.paginationStyle = newStyle;
+        this.router?.updateQueryParams({ style: newStyle });
+        const direction = storage.getDirection();
+        const results = getResultsFn ? getResultsFn() : [];
+        this.updateSearchResultsGrid(results, direction, this.lastSearchQuery);
+      },
+      onPrefetchNext: (nextPage) => {
+        const results = getResultsFn ? getResultsFn() : [];
+        sliceArray(results, nextPage, this.pageSize, false);
+      },
+      scrollTarget: document.querySelector('.results-section'),
+      listHeading: document.getElementById('results-heading')
+    });
   },
 
   bindCardActions() {
@@ -928,12 +1056,23 @@ export const ui = {
             const chTitle = this.getChapterTitle(chKey);
             return `
               <div class="chapter-group">
-                <div class="chapter-header">
-                  <h3 class="chapter-title">Chapter ${this.escapeHtml(chKey)}: ${this.escapeHtml(chTitle)}</h3>
-                  <span class="chapter-count-badge">${items.length} ${items.length === 1 ? 'section' : 'sections'}</span>
+                <div class="chapter-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                  <div>
+                    <h3 class="chapter-title">
+                      <a href="#/chapters/${chKey.toLowerCase()}" style="color: var(--text-primary); text-decoration: none;">
+                        Chapter ${this.escapeHtml(chKey)}: ${this.escapeHtml(chTitle)}
+                      </a>
+                    </h3>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="chapter-count-badge">${items.length} ${items.length === 1 ? 'section' : 'sections'}</span>
+                    <a href="#/chapters/${chKey.toLowerCase()}" class="btn btn-outline" style="font-size: 0.8rem; padding: 4px 10px;">
+                      Browse Chapter &rarr;
+                    </a>
+                  </div>
                 </div>
                 <div class="chapter-sections-list">
-                  ${items.map(item => `
+                  ${items.slice(0, 6).map(item => `
                     <a href="#/section/${item.id}" class="chapter-section-item">
                       <div class="sec-info-left">
                         <span class="sec-pill-num">
@@ -946,6 +1085,13 @@ export const ui = {
                       <div>${this.getBadgeHtml(item.change)}</div>
                     </a>
                   `).join('')}
+                  ${items.length > 6 ? `
+                    <div style="padding: 10px 14px; text-align: center; background: var(--bg-subtle); border-radius: var(--radius-sm); font-size: 0.85rem;">
+                      <a href="#/chapters/${chKey.toLowerCase()}" style="color: var(--accent); font-weight: 600; text-decoration: none;">
+                        + View all ${items.length} sections in Chapter ${chKey} with pagination &rarr;
+                      </a>
+                    </div>
+                  ` : ''}
                 </div>
               </div>
             `;
@@ -964,14 +1110,157 @@ export const ui = {
   },
 
   // -------------------------------------------------------------
+  // View 3b: Chapter Detail Browser (Section List Inside Chapter)
+  // -------------------------------------------------------------
+  renderChapterDetailView(chapterKey, query = {}) {
+    const rawKey = String(chapterKey || '').trim().toUpperCase();
+    const chMeta = this.chaptersIndex.find(c =>
+      c.chapter.toUpperCase() === rawKey ||
+      String(c.chapter).toUpperCase() === rawKey ||
+      c.file.toLowerCase().includes(rawKey.toLowerCase())
+    ) || { chapter: rawKey, title: `Chapter ${rawKey}`, range: '1-358' };
+
+    document.title = `Chapter ${chMeta.chapter}: ${chMeta.title} — BNS Mapper`;
+
+    const filterChange = query.filter || 'all';
+    const pageSize = query.size ? parseInt(query.size, 10) : getStoredPageSize();
+    const paginationStyle = query.style || getStoredPaginationStyle();
+
+    const allSections = searchEngine.getAllSections();
+    const chapterSections = allSections.filter(s => s.chapter && s.chapter.toUpperCase() === chMeta.chapter.toUpperCase());
+    const filtered = filterChange === 'all'
+      ? chapterSections
+      : chapterSections.filter(s => s.change === filterChange);
+
+    const totalPages = getPageCount(filtered.length, pageSize);
+    const currentPage = clampPage(query.page || 1, totalPages);
+
+    if (query.page && parseInt(query.page, 10) !== currentPage) {
+      this.router?.updateQueryParams({ page: currentPage }, { replace: true });
+    }
+
+    const displayed = sliceArray(filtered, currentPage, pageSize, paginationStyle === 'loadMore');
+    const direction = storage.getDirection();
+
+    this.appContainer.innerHTML = `
+      <section class="chapters-view-container" aria-labelledby="chapter-detail-title">
+        <div style="margin-bottom: 20px;">
+          <div style="margin-bottom: 8px;">
+            <a href="#/chapters" class="back-link">&larr; Back to All Chapters</a>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <span class="card-chapter-tag" style="font-size: 0.85rem;">Chapter ${this.escapeHtml(chMeta.chapter)} • Sections ${this.escapeHtml(chMeta.range)}</span>
+              <h2 id="chapter-detail-title" style="font-size: 2.2rem; margin: 4px 0 6px;">
+                ${this.escapeHtml(chMeta.title)}
+              </h2>
+              <p style="color: var(--text-secondary); margin: 0;">
+                Showing statutory provisions codified in Chapter ${this.escapeHtml(chMeta.chapter)} of Bharatiya Nyaya Sanhita, 2023.
+              </p>
+            </div>
+            <div>
+              <span class="badge badge-renumbered" style="font-size: 0.9rem; padding: 6px 14px;">
+                ${chapterSections.length} Total Provisions
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-pills-row" style="justify-content: flex-start; margin-bottom: 24px;" role="radiogroup" aria-label="Filter chapter sections by change type">
+          ${['all', 'renumbered', 'modified', 'merged', 'split', 'new', 'omitted'].map(type => `
+            <button class="filter-pill ${filterChange === type ? 'active' : ''}" data-ch-filter="${type}" role="radio" aria-checked="${filterChange === type}">
+              ${type.charAt(0).toUpperCase() + type.slice(1)}
+            </button>
+          `).join('')}
+        </div>
+
+        <div class="results-section" aria-live="polite">
+          <div class="results-meta-bar" id="chapter-results-heading">
+            <span class="results-count">
+              ${getResultSummary(currentPage, pageSize, filtered.length, 'sections', paginationStyle === 'loadMore')}
+              ${filterChange !== 'all' ? `marked <em>${filterChange}</em>` : ''}
+            </span>
+          </div>
+
+          ${filtered.length === 0 ? `
+            <div class="empty-state">
+              <h3>No provisions matching filter "${this.escapeHtml(filterChange)}"</h3>
+              <p>Try switching to "All" to browse all sections in this chapter.</p>
+            </div>
+          ` : `
+            <div class="sections-grid page-crossfade">
+              ${displayed.map(item => this.renderSectionCard(item, direction)).join('')}
+            </div>
+
+            <div id="chapter-detail-pagination-container">
+              ${renderPaginationHtml({
+                currentPage,
+                totalPages,
+                totalItems: filtered.length,
+                pageSize,
+                paginationStyle,
+                itemLabel: 'sections'
+              })}
+            </div>
+          `}
+        </div>
+      </section>
+    `;
+
+    document.querySelectorAll('[data-ch-filter]').forEach(btn => {
+      btn.onclick = () => {
+        const f = btn.getAttribute('data-ch-filter');
+        this.router?.updateQueryParams({ filter: f === 'all' ? null : f, page: 1 });
+      };
+    });
+
+    const pagContainer = document.getElementById('chapter-detail-pagination-container');
+    if (pagContainer) {
+      bindPaginationEvents(pagContainer, {
+        onPageChange: (newPage) => {
+          this.router?.updateQueryParams({ page: newPage });
+        },
+        onPageSizeChange: (newSize) => {
+          const newPage = calculatePageForNewPageSize(currentPage, pageSize, newSize);
+          this.router?.updateQueryParams({ size: newSize, page: newPage });
+        },
+        onStyleChange: (newStyle) => {
+          this.router?.updateQueryParams({ style: newStyle });
+        },
+        onPrefetchNext: (nextPage) => {
+          sliceArray(filtered, nextPage, pageSize, false);
+        },
+        scrollTarget: document.querySelector('.results-section'),
+        listHeading: document.getElementById('chapter-results-heading')
+      });
+    }
+
+    announcePaginationChange(currentPage, totalPages, filtered.length, pageSize, 'sections');
+    this.bindCardActions();
+    this.initCardTilt();
+    this.renderCompareTray();
+  },
+
+  // -------------------------------------------------------------
   // View 4: Bookmarks & Printable Cheat Sheet View
   // -------------------------------------------------------------
-  renderBookmarksView() {
+  renderBookmarksView(query = {}) {
     document.title = 'My Sections & Cheat Sheet — BNS Mapper';
     const bookmarkedIds = storage.getBookmarks();
     const allSections = searchEngine.getAllSectionsCombined();
     const savedSections = allSections.filter(s => bookmarkedIds.includes(s.id));
     const direction = storage.getDirection();
+
+    const pageSize = query.size ? parseInt(query.size, 10) : getStoredPageSize();
+    const paginationStyle = query.style || getStoredPaginationStyle();
+    const totalPages = getPageCount(savedSections.length, pageSize);
+    const currentPage = clampPage(query.page || 1, totalPages);
+
+    if (query.page && parseInt(query.page, 10) !== currentPage) {
+      this.router?.updateQueryParams({ page: currentPage }, { replace: true });
+    }
+
+    const displayed = sliceArray(savedSections, currentPage, pageSize, paginationStyle === 'loadMore');
 
     this.appContainer.innerHTML = `
       <section class="bookmarks-view" aria-labelledby="bookmarks-title">
@@ -983,7 +1272,7 @@ export const ui = {
         <div class="bookmarks-view-header">
           <div>
             <h2 id="bookmarks-title" style="font-size: 2rem; margin-bottom: 4px;">My Saved Sections</h2>
-            <p>Your custom study list saved locally on this browser.</p>
+            <p>Your custom study list saved locally on this browser (${savedSections.length} sections bookmarked).</p>
           </div>
 
           <div style="display: flex; gap: 8px;">
@@ -1015,6 +1304,12 @@ export const ui = {
             </div>
           </div>
         ` : `
+          <div class="results-meta-bar" style="margin-bottom: 12px;">
+            <span class="results-count">
+              ${getResultSummary(currentPage, pageSize, savedSections.length, 'saved sections', paginationStyle === 'loadMore')}
+            </span>
+          </div>
+
           <div class="cheat-sheet-table-wrap">
             <table class="cheat-sheet-table" aria-label="Bookmarked sections cheat sheet">
               <thead>
@@ -1028,7 +1323,7 @@ export const ui = {
                 </tr>
               </thead>
               <tbody>
-                ${savedSections.map(item => `
+                ${displayed.map(item => `
                   <tr>
                     <td><strong>${this.formatSections(item.ipc)}</strong></td>
                     <td><strong style="color: var(--accent);">${this.formatSections(item.bns)}</strong></td>
@@ -1044,9 +1339,20 @@ export const ui = {
 
           <div style="margin-top: 36px;">
             <div class="section-label">Detailed Saved Cards</div>
-            <div class="sections-grid">
-              ${savedSections.map(item => this.renderSectionCard(item, direction)).join('')}
+            <div class="sections-grid page-crossfade">
+              ${displayed.map(item => this.renderSectionCard(item, direction)).join('')}
             </div>
+          </div>
+
+          <div id="bookmarks-pagination-container">
+            ${renderPaginationHtml({
+              currentPage,
+              totalPages,
+              totalItems: savedSections.length,
+              pageSize,
+              paginationStyle,
+              itemLabel: 'saved sections'
+            })}
           </div>
         `}
       </section>
@@ -1064,6 +1370,28 @@ export const ui = {
         }
       };
     }
+
+    const pagContainer = document.getElementById('bookmarks-pagination-container');
+    if (pagContainer) {
+      bindPaginationEvents(pagContainer, {
+        onPageChange: (newPage) => {
+          this.router?.updateQueryParams({ page: newPage });
+        },
+        onPageSizeChange: (newSize) => {
+          const newPage = calculatePageForNewPageSize(currentPage, pageSize, newSize);
+          this.router?.updateQueryParams({ size: newSize, page: newPage });
+        },
+        onStyleChange: (newStyle) => {
+          this.router?.updateQueryParams({ style: newStyle });
+        },
+        onPrefetchNext: (nextPage) => {
+          sliceArray(savedSections, nextPage, pageSize, false);
+        },
+        scrollTarget: document.querySelector('.bookmarks-view-header'),
+        listHeading: document.getElementById('bookmarks-title')
+      });
+    }
+
     this.bindCardActions();
     this.renderCompareTray();
   },
@@ -1071,10 +1399,12 @@ export const ui = {
   // -------------------------------------------------------------
   // View 5: QUIZ MODE & PROGRESS DASHBOARD
   // -------------------------------------------------------------
-  renderQuizView({ mode = 'mixed', chapter = 'all', difficulty = 'medium' } = {}) {
+  renderQuizView({ mode = 'mixed', chapter = 'all', difficulty = 'medium', page = 1, size = 5 } = {}) {
     document.title = 'Quiz & Exam Practice — BNS Mapper';
     const stats = storage.getQuizStats();
     const allChapters = [...new Set(searchEngine.getAllSections().map(s => s.chapter))];
+    const historyPage = parseInt(page, 10) || 1;
+    const historySize = parseInt(size, 10) || 5;
 
     this.appContainer.innerHTML = `
       <section class="quiz-container" aria-labelledby="quiz-page-title">
@@ -1171,6 +1501,11 @@ export const ui = {
             <div class="section-label" style="margin-bottom: 12px;">Weak Chapters &amp; Focused Revision</div>
             ${this.renderWeakChaptersDashboard(stats, allChapters)}
           </div>
+
+          <div class="chart-container" style="margin-top: 24px;">
+            <div class="section-label" style="margin-bottom: 12px;">Recent Practice Sessions</div>
+            ${this.renderQuizHistoryTable(stats.history, historyPage, historySize)}
+          </div>
         </section>
       </section>
     `;
@@ -1178,14 +1513,14 @@ export const ui = {
     document.querySelectorAll('[data-quiz-mode]').forEach(btn => {
       btn.onclick = () => {
         const m = btn.getAttribute('data-quiz-mode');
-        this.renderQuizView({ mode: m, chapter, difficulty });
+        this.renderQuizView({ mode: m, chapter, difficulty, page: historyPage, size: historySize });
       };
     });
 
     document.querySelectorAll('[data-quiz-diff]').forEach(btn => {
       btn.onclick = () => {
         const d = btn.getAttribute('data-quiz-diff');
-        this.renderQuizView({ mode, chapter, difficulty: d });
+        this.renderQuizView({ mode, chapter, difficulty: d, page: historyPage, size: historySize });
       };
     });
 
@@ -1201,6 +1536,87 @@ export const ui = {
         }
       };
     }
+
+    this.bindQuizHistoryPagination(stats.history, historyPage, historySize, mode, chapter, difficulty);
+    this.renderCompareTray();
+  },
+
+  renderQuizHistoryTable(history = [], page = 1, size = 5) {
+    if (!history || history.length === 0) {
+      return `
+        <div class="empty-state" style="padding: 24px; text-align: center;">
+          <p style="margin: 0; color: var(--text-muted);">No recorded quiz sessions yet. Complete a quiz session above to track your diagnostic score history!</p>
+        </div>
+      `;
+    }
+
+    const pageSize = Math.max(1, size || 5);
+    const totalPages = getPageCount(history.length, pageSize);
+    const currentPage = clampPage(page || 1, totalPages);
+    const reversedHistory = history.slice().reverse();
+    const displayed = sliceArray(reversedHistory, currentPage, pageSize);
+
+    return `
+      <div class="quiz-history-wrapper">
+        <div class="cheat-sheet-table-wrap">
+          <table class="cheat-sheet-table" aria-label="Practice sessions history">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Mode</th>
+                <th>Chapter / Topic</th>
+                <th>Score</th>
+                <th>Accuracy</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${displayed.map(h => `
+                <tr>
+                  <td><strong>${this.escapeHtml(h.date)}</strong></td>
+                  <td><span class="badge ${h.mode === 'timed' ? 'badge-modified' : 'badge-renumbered'}">${this.escapeHtml(h.mode)}</span></td>
+                  <td>${this.escapeHtml(h.chapter || 'All Chapters')}</td>
+                  <td><strong>${h.score} / ${h.total}</strong></td>
+                  <td><strong>${h.pct}%</strong></td>
+                  <td>
+                    ${h.pct >= 70 ? `
+                      <span style="color: var(--color-success); font-weight: 600;">✔ Passed</span>
+                    ` : `
+                      <span style="color: var(--color-danger); font-weight: 600;">Needs Revision</span>
+                    `}
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <div id="quiz-history-pagination-container">
+          ${renderPaginationHtml({
+            currentPage,
+            totalPages,
+            totalItems: history.length,
+            pageSize,
+            paginationStyle: 'pages',
+            itemLabel: 'sessions',
+            showStyleSelector: false,
+            showSizeSelector: false
+          })}
+        </div>
+      </div>
+    `;
+  },
+
+  bindQuizHistoryPagination(history, currentPage, pageSize, mode, chapter, difficulty) {
+    const container = document.getElementById('quiz-history-pagination-container');
+    if (!container) return;
+
+    bindPaginationEvents(container, {
+      onPageChange: (newPage) => {
+        this.renderQuizView({ mode, chapter, difficulty, page: newPage, size: pageSize });
+      },
+      scrollTarget: document.querySelector('.quiz-history-wrapper')
+    });
   },
 
   renderHistorySvgChart(history) {
@@ -1747,12 +2163,22 @@ export const ui = {
   // -------------------------------------------------------------
   // View 7: WHAT'S NEW IN BNS (BRAND-NEW OFFENCES)
   // -------------------------------------------------------------
-  renderWhatsNew() {
+  renderWhatsNew(query = {}) {
     document.title = "What's New in Bharatiya Nyaya Sanhita — BNS Mapper";
 
+    const pageSize = query.size ? parseInt(query.size, 10) : getStoredPageSize();
+    const paginationStyle = query.style || getStoredPaginationStyle();
     const allCombined = searchEngine.getAllSectionsCombined();
-    // Rebuild automatically from every entry with change = "new"
     const newSections = allCombined.filter(s => s.change === 'new');
+
+    const totalPages = getPageCount(newSections.length, pageSize);
+    const currentPage = clampPage(query.page || 1, totalPages);
+
+    if (query.page && parseInt(query.page, 10) !== currentPage) {
+      this.router?.updateQueryParams({ page: currentPage }, { replace: true });
+    }
+
+    const displayed = sliceArray(newSections, currentPage, pageSize, paginationStyle === 'loadMore');
 
     this.appContainer.innerHTML = `
       <section class="detail-view" aria-labelledby="whats-new-title">
@@ -1768,8 +2194,14 @@ export const ui = {
           </p>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 20px;">
-          ${newSections.map(sec => `
+        <div class="results-meta-bar" style="margin-bottom: 16px;">
+          <span class="results-count">
+            ${getResultSummary(currentPage, pageSize, newSections.length, 'new offences', paginationStyle === 'loadMore')}
+          </span>
+        </div>
+
+        <div class="sections-grid-vertical page-crossfade" style="display: flex; flex-direction: column; gap: 20px;">
+          ${displayed.map(sec => `
             <article class="detail-header-card" style="border-left: 4px solid var(--accent); transition: transform 0.2s ease;">
               <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
                 <div>
@@ -1811,15 +2243,49 @@ export const ui = {
             </article>
           `).join('')}
         </div>
+
+        <div id="whats-new-pagination-container">
+          ${renderPaginationHtml({
+            currentPage,
+            totalPages,
+            totalItems: newSections.length,
+            pageSize,
+            paginationStyle,
+            itemLabel: 'new offences'
+          })}
+        </div>
       </section>
     `;
+
+    const pagContainer = document.getElementById('whats-new-pagination-container');
+    if (pagContainer) {
+      bindPaginationEvents(pagContainer, {
+        onPageChange: (newPage) => {
+          this.router?.updateQueryParams({ page: newPage });
+        },
+        onPageSizeChange: (newSize) => {
+          const newPage = calculatePageForNewPageSize(currentPage, pageSize, newSize);
+          this.router?.updateQueryParams({ size: newSize, page: newPage });
+        },
+        onStyleChange: (newStyle) => {
+          this.router?.updateQueryParams({ style: newStyle });
+        },
+        onPrefetchNext: (nextPage) => {
+          sliceArray(newSections, nextPage, pageSize, false);
+        },
+        scrollTarget: document.querySelector('.detail-view'),
+        listHeading: document.getElementById('whats-new-title')
+      });
+    }
+
+    announcePaginationChange(currentPage, totalPages, newSections.length, pageSize, 'new offences');
     this.renderCompareTray();
   },
 
   // -------------------------------------------------------------
   // View 8: BNS COVERAGE & VERIFICATION DASHBOARD
   // -------------------------------------------------------------
-  renderCoverageView() {
+  renderCoverageView(query = {}) {
     document.title = "BNS Coverage & Gazette Verification Dashboard — BNS Mapper";
 
     const allSections = searchEngine.getAllSections();
@@ -1864,6 +2330,18 @@ export const ui = {
         pct: chPct
       };
     });
+
+    // Pagination for Chapter-by-Chapter breakdown (10 chapters per page)
+    const chPageSize = 10;
+    const chTotalPages = getPageCount(chapterRows.length, chPageSize);
+    const chCurrentPage = clampPage(query.chPage || 1, chTotalPages);
+    const displayedChapters = sliceArray(chapterRows, chCurrentPage, chPageSize);
+
+    // Pagination for Section-by-Section table (all 358 sections)
+    const secPageSize = query.secSize ? parseInt(query.secSize, 10) : getStoredPageSize();
+    const secTotalPages = getPageCount(bnsInDataset.length, secPageSize);
+    const secCurrentPage = clampPage(query.secPage || query.page || 1, secTotalPages);
+    const displayedSections = sliceArray(bnsInDataset, secCurrentPage, secPageSize);
 
     this.appContainer.innerHTML = `
       <section class="detail-view" aria-labelledby="coverage-page-title">
@@ -1938,13 +2416,18 @@ export const ui = {
           </div>
         </div>
 
-        <!-- Chapter-by-Chapter Coverage Breakdown -->
+        <!-- Chapter-by-Chapter Coverage Breakdown with Pagination -->
         <div style="margin-bottom: 16px;">
-          <h3 style="font-size: 1.4rem; margin-bottom: 16px;">Chapter-by-Chapter Codification &amp; Verification Status</h3>
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+            <h3 style="font-size: 1.4rem; margin: 0;">Chapter-by-Chapter Codification &amp; Verification Status</h3>
+            <span style="font-size: 0.85rem; color: var(--text-secondary);">
+              Showing Chapters ${(chCurrentPage - 1) * chPageSize + 1}–${Math.min(chCurrentPage * chPageSize, chapterRows.length)} of ${chapterRows.length}
+            </span>
+          </div>
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 14px;">
-          ${chapterRows.map(ch => `
+          ${displayedChapters.map(ch => `
             <div class="chapter-card" style="padding: 16px 20px;">
               <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
                 <div>
@@ -1952,7 +2435,7 @@ export const ui = {
                     Chapter ${ch.chapter} &bull; Sections ${ch.range}
                   </div>
                   <h4 style="font-size: 1.15rem; margin-top: 2px;">
-                    <a href="#/chapters" style="color: var(--text-primary); text-decoration: none;">
+                    <a href="#/chapters/${ch.chapter.toLowerCase()}" style="color: var(--text-primary); text-decoration: none;">
                       ${this.escapeHtml(ch.title)}
                     </a>
                   </h4>
@@ -1986,15 +2469,124 @@ export const ui = {
 
               <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.825rem; color: var(--text-muted);">
                 <span>Dataset: <code>data/chapters/${ch.file}</code></span>
-                <a href="#/search?chapter=${ch.chapter}" class="card-read-more" style="font-size: 0.825rem;">
+                <a href="#/chapters/${ch.chapter.toLowerCase()}" class="card-read-more" style="font-size: 0.825rem;">
                   Browse Chapter Sections &rarr;
                 </a>
               </div>
             </div>
           `).join('')}
         </div>
+
+        <div id="ch-coverage-pagination-container">
+          ${renderPaginationHtml({
+            currentPage: chCurrentPage,
+            totalPages: chTotalPages,
+            totalItems: chapterRows.length,
+            pageSize: chPageSize,
+            paginationStyle: 'pages',
+            itemLabel: 'chapters',
+            showStyleSelector: false,
+            showSizeSelector: false
+          })}
+        </div>
+
+        <!-- Section-by-Section Verification Table (Paginated across all 358 sections) -->
+        <div style="margin-top: 40px; margin-bottom: 16px;">
+          <h3 id="sec-coverage-heading" style="font-size: 1.4rem; margin-bottom: 8px;">Section-by-Section Verification Table</h3>
+          <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 16px;">
+            Comprehensive registry of all 358 codified Bharatiya Nyaya Sanhita sections with gazette review statuses.
+          </p>
+
+          <div class="results-meta-bar" style="margin-bottom: 12px;">
+            <span class="results-count">
+              ${getResultSummary(secCurrentPage, secPageSize, bnsInDataset.length, 'sections')}
+            </span>
+          </div>
+
+          <div class="cheat-sheet-table-wrap">
+            <table class="cheat-sheet-table" aria-label="Section-by-section verification table">
+              <thead>
+                <tr>
+                  <th>BNS Section</th>
+                  <th>Old IPC</th>
+                  <th>Provision Title</th>
+                  <th>Chapter</th>
+                  <th>Change Type</th>
+                  <th>Gazette Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${displayedSections.map(sec => {
+                  const isTodo = JSON.stringify(sec).includes('TODO');
+                  return `
+                    <tr>
+                      <td><strong style="color: var(--accent); font-family: var(--font-mono);">${this.formatSections(sec.bns, 'BNS')}</strong></td>
+                      <td><strong>${this.formatSections(sec.ipc, 'IPC')}</strong></td>
+                      <td><a href="#/section/${sec.id}"><strong>${this.escapeHtml(sec.title)}</strong></a></td>
+                      <td><span class="card-chapter-tag">${sec.chapter || '—'}</span></td>
+                      <td>${this.getBadgeHtml(sec.change)}</td>
+                      <td>
+                        ${sec.verified === true ? `
+                          <span class="badge badge-renumbered" style="font-size: 0.8rem;">✔ Verified</span>
+                        ` : isTodo ? `
+                          <span class="badge badge-omitted" style="font-size: 0.8rem;">⚠ TODO Item</span>
+                        ` : `
+                          <span class="badge badge-modified" style="font-size: 0.8rem;">Pending Review</span>
+                        `}
+                      </td>
+                      <td>
+                        <a href="#/section/${sec.id}" class="btn btn-outline" style="font-size: 0.78rem; padding: 4px 8px;">
+                          View &rarr;
+                        </a>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <div id="sec-coverage-pagination-container">
+            ${renderPaginationHtml({
+              currentPage: secCurrentPage,
+              totalPages: secTotalPages,
+              totalItems: bnsInDataset.length,
+              pageSize: secPageSize,
+              paginationStyle: 'pages',
+              itemLabel: 'sections'
+            })}
+          </div>
+        </div>
       </section>
     `;
+
+    // Bind pagination for chapter list
+    const chPagContainer = document.getElementById('ch-coverage-pagination-container');
+    if (chPagContainer) {
+      bindPaginationEvents(chPagContainer, {
+        onPageChange: (newPage) => {
+          this.router?.updateQueryParams({ chPage: newPage });
+        },
+        scrollTarget: document.querySelector('.chapter-card')
+      });
+    }
+
+    // Bind pagination for section table
+    const secPagContainer = document.getElementById('sec-coverage-pagination-container');
+    if (secPagContainer) {
+      bindPaginationEvents(secPagContainer, {
+        onPageChange: (newPage) => {
+          this.router?.updateQueryParams({ secPage: newPage });
+        },
+        onPageSizeChange: (newSize) => {
+          const newPage = calculatePageForNewPageSize(secCurrentPage, secPageSize, newSize);
+          this.router?.updateQueryParams({ secSize: newSize, secPage: newPage });
+        },
+        scrollTarget: document.getElementById('sec-coverage-heading'),
+        listHeading: document.getElementById('sec-coverage-heading')
+      });
+    }
 
     this.renderCompareTray();
   },
