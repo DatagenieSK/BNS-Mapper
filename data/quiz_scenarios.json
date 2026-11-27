@@ -633,5 +633,185 @@
     "answer": "By providing judicial discretion between death OR imprisonment for the remainder of natural life, along with fine",
     "correctIndex": 0,
     "explanation": "BNS Section 104 cures the unconstitutional mandatory death sentence of IPC 303 by granting judges the discretion to award either capital punishment or imprisonment for the remainder of natural life."
+  },
+  {
+    "id": "scen-ch7-01",
+    "section": "bns-152",
+    "chapter": "VII",
+    "scenario": "An online operator uses encrypted electronic communications and foreign financial channels to knowingly incite armed secessionist activities threatening India's sovereignty. Which BNS section replaces the colonial sedition law (IPC 124A) and covers electronic/financial means?",
+    "options": [
+      "BNS Section 152 (Act endangering sovereignty, unity and integrity of India)",
+      "BNS Section 124A",
+      "BNS Section 147",
+      "BNS Section 151"
+    ],
+    "answer": "BNS Section 152 (Act endangering sovereignty, unity and integrity of India)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 152 replaces former IPC Section 124A, specifically criminalizing acts inciting secession, armed rebellion, or subversive activities through electronic or financial means."
+  },
+  {
+    "id": "scen-ch7-02",
+    "section": "bns-147",
+    "chapter": "VII",
+    "scenario": "An insurgent leader abets an organized armed assault against military garrisons to wage war against the Government of India. Under BNS Section 147, what are the prescribed punishments?",
+    "options": [
+      "Death or imprisonment for life, and fine",
+      "Imprisonment for 7 years and fine",
+      "Rigorous imprisonment for 3 years",
+      "Community service for 1 year"
+    ],
+    "answer": "Death or imprisonment for life, and fine",
+    "correctIndex": 0,
+    "explanation": "BNS Section 147 (formerly IPC 121) carries forward capital punishment or imprisonment for life and fine for waging or abetting war against the Government of India."
+  },
+  {
+    "id": "scen-ch7-03",
+    "section": "bns-153",
+    "chapter": "VII",
+    "scenario": "A mercenary group in India plans and launches an armed offensive against a friendly foreign neighbor at peace with India. In BNS Section 153, how was the colonial terminology of IPC Section 125 modernized?",
+    "options": [
+      "The phrase 'Asiatic power' was replaced with 'any foreign State at peace with the Government of India'",
+      "The offence was repealed completely",
+      "It now applies only to Commonwealth nations",
+      "Punishment was changed to simple fine"
+    ],
+    "answer": "The phrase 'Asiatic power' was replaced with 'any foreign State at peace with the Government of India'",
+    "correctIndex": 0,
+    "explanation": "BNS Section 153 modernizes former IPC Section 125 by replacing the outdated colonial reference to 'Asiatic power' with universal 'foreign State at peace with the Government of India'."
+  },
+  {
+    "id": "scen-ch8-01",
+    "section": "bns-160",
+    "chapter": "VIII",
+    "scenario": "A civilian political agitator infiltrates an army regiment and instigates soldiers to mutiny. If an armed mutiny is actually committed in consequence, what maximum sentence may the agitator face under BNS Section 160?",
+    "options": [
+      "Death, or imprisonment for life, or imprisonment up to 10 years, and fine",
+      "Imprisonment up to 3 years and fine",
+      "Fine of ₹5,000 only",
+      "Trial under the Army Act exclusively"
+    ],
+    "answer": "Death, or imprisonment for life, or imprisonment up to 10 years, and fine",
+    "correctIndex": 0,
+    "explanation": "Under BNS Section 160 (formerly IPC Section 132), abetment of military mutiny where mutiny is committed in consequence is punishable with death, life imprisonment, or up to 10 years and fine."
+  },
+  {
+    "id": "scen-ch8-02",
+    "section": "bns-164",
+    "chapter": "VIII",
+    "scenario": "A soldier deserts his armed forces unit and flees home. His wife shelters and conceals him in their private residence knowing he is a deserter. Is the wife criminally liable under BNS Section 164?",
+    "options": [
+      "No, BNS Section 164 expressly maintains an exception shielding a spouse who harbours a deserter",
+      "Yes, harbouring any military deserter carries mandatory 2 years imprisonment",
+      "Yes, under BNS Section 159 for abetting mutiny",
+      "No, but only if she reports him within 24 hours"
+    ],
+    "answer": "No, BNS Section 164 expressly maintains an exception shielding a spouse who harbours a deserter",
+    "correctIndex": 0,
+    "explanation": "BNS Section 164 (formerly IPC Section 136) contains an express statutory exception providing that the provision does not extend to the case in which the harbour is given by the spouse of the deserter."
+  },
+  {
+    "id": "scen-ch8-03",
+    "section": "bns-168",
+    "chapter": "VIII",
+    "scenario": "A civilian puts on an Indian Army combat uniform and walks through a restricted zone intending onlookers to believe he is an active commissioned officer. Which section of BNS penalizes this act?",
+    "options": [
+      "BNS Section 168 (Wearing garb or carrying token used by soldier, sailor or airman)",
+      "BNS Section 132",
+      "BNS Section 188",
+      "BNS Section 112"
+    ],
+    "answer": "BNS Section 168 (Wearing garb or carrying token used by soldier, sailor or airman)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 168 (formerly IPC Section 140) punishes unauthorized wearing of military garb or carrying armed forces tokens with intent to deceive with imprisonment up to 3 months or fine up to ₹2,000 or both."
+  },
+  {
+    "id": "scen-ch9-01",
+    "section": "bns-170",
+    "chapter": "IX",
+    "scenario": "During an election rally, a political candidate promises that if his party is elected, the government will build a multi-specialty public hospital and waive electricity bills for poor households. Does this promise constitute electoral bribery under BNS Section 170?",
+    "options": [
+      "No, the statutory exception to Section 170 explicitly excludes declarations of public policy or promises of public action",
+      "Yes, any promise of material benefit to voters constitutes bribery",
+      "Yes, punishable under BNS Section 173 with 1 year imprisonment",
+      "No, only because the election commission has not notified the code of conduct"
+    ],
+    "answer": "No, the statutory exception to Section 170 explicitly excludes declarations of public policy or promises of public action",
+    "correctIndex": 0,
+    "explanation": "Under the proviso to BNS Section 170 (formerly IPC Section 171B), a declaration of public policy or a promise of public action is not an offence of bribery."
+  },
+  {
+    "id": "scen-ch9-02",
+    "section": "bns-171",
+    "chapter": "IX",
+    "scenario": "A religious preacher tells a congregation of voters that anyone voting for Candidate X will incur divine displeasure and be excommunicated from the community. Which election offence is committed under BNS?",
+    "options": [
+      "BNS Section 171 (Undue influence at elections)",
+      "BNS Section 170 (Bribery)",
+      "BNS Section 175 (False statement)",
+      "BNS Section 177 (Failure to keep accounts)"
+    ],
+    "answer": "BNS Section 171 (Undue influence at elections)",
+    "correctIndex": 0,
+    "explanation": "Under BNS Section 171 (formerly IPC Section 171C), inducing or attempting to induce a voter to believe they will become an object of divine displeasure constitutes undue influence."
+  },
+  {
+    "id": "scen-ch9-03",
+    "section": "bns-172",
+    "chapter": "IX",
+    "scenario": "At a polling booth, a man presents an identity card belonging to his deceased neighbor and casts a ballot in the dead man's name. Which section of BNS defines this offence of personation at elections?",
+    "options": [
+      "BNS Section 172 (Personation at elections)",
+      "BNS Section 169",
+      "BNS Section 176",
+      "BNS Section 112"
+    ],
+    "answer": "BNS Section 172 (Personation at elections)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 172 (formerly IPC Section 171D) defines personation at elections as voting or applying for a ballot in the name of any other person, whether living or dead, or fictitious."
+  },
+  {
+    "id": "scen-ch10-01",
+    "section": "bns-178",
+    "chapter": "X",
+    "scenario": "Under the old IPC, counterfeiting coins, stamps, and currency notes was scattered across Chapters XII (ss. 231-255) and XVIII (s. 489A). How has the BNS restructured this in Section 178?",
+    "options": [
+      "Merged all counterfeiting offences across coins, Government stamps, and currency notes into a single umbrella section",
+      "Decriminalized counterfeiting of coins while keeping notes illegal",
+      "Transferred all counterfeiting matters to the Reserve Bank of India Act exclusively",
+      "Divided counterfeiting into four distinct new chapters"
+    ],
+    "answer": "Merged all counterfeiting offences across coins, Government stamps, and currency notes into a single umbrella section",
+    "correctIndex": 0,
+    "explanation": "BNS Section 178 unifies former IPC Sections 231, 232, 255, and 489A into a single comprehensive section punishing counterfeiting of coins, stamps, and banknotes with life imprisonment or up to 10 years and fine."
+  },
+  {
+    "id": "scen-ch10-02",
+    "section": "bns-180",
+    "chapter": "X",
+    "scenario": "A bank teller discovers five high-quality counterfeit ₹500 notes in a bundle deposited by a merchant. To convict the merchant under BNS Section 180, what specific mental element must the prosecution establish?",
+    "options": [
+      "That the person possessed the notes knowing them to be counterfeit AND intending to use them as genuine or that they may be used as genuine",
+      "Mere physical possession is a strict liability offence with no mental element required",
+      "That the person operated a printing machine personally",
+      "That the notes were imported from outside India"
+    ],
+    "answer": "That the person possessed the notes knowing them to be counterfeit AND intending to use them as genuine or that they may be used as genuine",
+    "correctIndex": 0,
+    "explanation": "Under BNS Section 180 (formerly IPC Section 489C), possession alone is not enough; the prosecution must prove knowledge of counterfeiting coupled with the intention to use as genuine."
+  },
+  {
+    "id": "scen-ch10-03",
+    "section": "bns-182",
+    "chapter": "X",
+    "scenario": "A toy manufacturer prints novelty coupons that closely resemble Reserve Bank of India currency notes in size and colour for a board game. Under BNS Section 182, what penalty applies for making documents resembling currency notes?",
+    "options": [
+      "Fine which may extend to five thousand rupees",
+      "Rigorous imprisonment for 7 years",
+      "Life imprisonment",
+      "No penalty if marked as toy money"
+    ],
+    "answer": "Fine which may extend to five thousand rupees",
+    "correctIndex": 0,
+    "explanation": "BNS Section 182 (formerly IPC Section 489E) penalizes making or using documents resembling currency notes or banknotes with a fine extending up to ₹5,000."
   }
 ]
