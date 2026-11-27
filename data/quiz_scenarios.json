@@ -453,5 +453,95 @@
     "answer": "BNS Section 41 (right of private defence of property against night house-breaking extends to causing death)",
     "correctIndex": 0,
     "explanation": "Under BNS Section 41 (formerly IPC Section 103), the right of private defence of property extends to voluntary causing of death in cases of house-breaking by night or robbery."
+  },
+  {
+    "id": "scen-ch4-01",
+    "section": "bns-48",
+    "chapter": "IV",
+    "scenario": "A cyber-criminal residing in Country X sends remote malicious code and instructions to an operative in New Delhi to hack a power grid inside India. Under IPC, prosecuting foreign abettors was procedurally complex. Which newly introduced section of BNS explicitly penalizes abetment outside India for an offence inside India?",
+    "options": [
+      "BNS Section 48 (Abetment outside India for offence in India)",
+      "BNS Section 45",
+      "BNS Section 61",
+      "BNS Section 113"
+    ],
+    "answer": "BNS Section 48 (Abetment outside India for offence in India)",
+    "correctIndex": 0,
+    "explanation": "Section 48 of BNS is a newly enacted provision that explicitly criminalizes a person who, outside and beyond India, abets the commission of any act within India that would constitute an offence."
+  },
+  {
+    "id": "scen-ch4-02",
+    "section": "bns-51",
+    "chapter": "IV",
+    "scenario": "A instigates B to burn down Z's empty barn at midnight. While burning the barn, B also takes the opportunity to steal jewellery from a nearby farmhouse without A's knowledge or expectation. Is A liable for the jewellery theft as an abettor?",
+    "options": [
+      "No, because under BNS Section 51 an abettor is liable for a different act only if it was a probable consequence of the abetment",
+      "Yes, an abettor is strictly liable for every single crime the perpetrator commits that night",
+      "Yes, under Section 61 for criminal conspiracy",
+      "No, because burning a barn is not an offence under BNS"
+    ],
+    "answer": "No, because under BNS Section 51 an abettor is liable for a different act only if it was a probable consequence of the abetment",
+    "correctIndex": 0,
+    "explanation": "Under BNS Section 51 (formerly IPC 111), when an act is abetted and a different act is done, the abettor is liable for the divergent act only if it was a probable consequence of the abetment."
+  },
+  {
+    "id": "scen-ch4-03",
+    "section": "bns-61",
+    "chapter": "IV",
+    "scenario": "Three persons agree in a private room to commit armed bank dacoity next month, but are arrested before taking any physical steps towards the bank. Are they guilty of criminal conspiracy, and under which section are definition and punishment now consolidated?",
+    "options": [
+      "Guilty under BNS Section 61 (merging IPC 120A definition and IPC 120B punishment into one section)",
+      "Not guilty, because no overt physical act has occurred",
+      "Guilty only under BNS Section 62 for attempt",
+      "Not guilty, because an agreement alone can never constitute an offence"
+    ],
+    "answer": "Guilty under BNS Section 61 (merging IPC 120A definition and IPC 120B punishment into one section)",
+    "correctIndex": 0,
+    "explanation": "Under BNS Section 61 (consolidating IPC 120A and 120B), an agreement to commit a serious offence punishable with rigorous imprisonment of 2+ years constitutes criminal conspiracy without requiring any overt act."
+  },
+  {
+    "id": "scen-ch5-01",
+    "section": "bns-69",
+    "chapter": "V",
+    "scenario": "A man creates a fake profile concealing his true religious identity and marital status, promises to marry a woman, engages in sexual intercourse with her, and subsequently abandons her after securing his promotion. Under the old IPC, this was litigated under rape (s. 375/90) or cheating (s. 417). Which new section of BNS specifically penalizes this conduct?",
+    "options": [
+      "BNS Section 69 (Sexual intercourse by employing deceitful means or false promise of marriage)",
+      "BNS Section 63 (Rape)",
+      "BNS Section 75 (Sexual harassment)",
+      "BNS Section 84 (Enticing a married woman)"
+    ],
+    "answer": "BNS Section 69 (Sexual intercourse by employing deceitful means or false promise of marriage)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 69 is a landmark new provision explicitly criminalizing sexual intercourse by deceitful means (including false promise of employment, promotion, or marriage after concealing identity) with imprisonment up to 10 years and fine."
+  },
+  {
+    "id": "scen-ch5-02",
+    "section": "bns-70",
+    "chapter": "V",
+    "scenario": "A 17-year-old girl is gang-raped by three men acting in furtherance of a common intention. Under BNS Section 70(2), what is the mandatory punishment prescribed for each perpetrator?",
+    "options": [
+      "Imprisonment for life (remainder of natural life) and fine, or death",
+      "Imprisonment for not less than 7 years extending to 10 years",
+      "Rigorous imprisonment for 10 years and fine",
+      "Community service for 2 years"
+    ],
+    "answer": "Imprisonment for life (remainder of natural life) and fine, or death",
+    "correctIndex": 0,
+    "explanation": "BNS Section 70(2) significantly expanded the minor threshold to all females under 18 years of age, prescribing imprisonment for the remainder of natural life or the death penalty for every member of the group."
+  },
+  {
+    "id": "scen-ch5-03",
+    "section": "bns-95",
+    "chapter": "V",
+    "scenario": "An adult gang leader recruits and pays a 13-year-old child to transport illicit firearms and contraband across state checkpoints. Which newly introduced section of BNS punishes hiring or engaging a child to commit an offence?",
+    "options": [
+      "BNS Section 95 (Hiring, employing or engaging a child to commit an offence)",
+      "BNS Section 45 (Abetment)",
+      "BNS Section 87 (Kidnapping)",
+      "BNS Section 93 (Child abandonment)"
+    ],
+    "answer": "BNS Section 95 (Hiring, employing or engaging a child to commit an offence)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 95 is a brand-new offence specifically penalizing anyone who hires, employs, or engages a child to commit crimes or in sexual exploitation/child pornography, prescribing 3 to 10 years imprisonment, fine, and liability as if the adult committed the crime personally."
   }
 ]
