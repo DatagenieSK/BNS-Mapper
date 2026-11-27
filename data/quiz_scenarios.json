@@ -1008,5 +1008,185 @@
     "answer": "The burden of proving sufficient cause lies squarely upon the accused",
     "correctIndex": 0,
     "explanation": "Under BNS Section 269 (formerly IPC Section 229A), failure to appear in court after release on bail or bond is an independent cognizable offence where the burden of proving sufficient cause lies specifically upon the accused."
+  },
+  {
+    "id": "scen-ch15-01",
+    "section": "bns-281",
+    "chapter": "XV",
+    "scenario": "A driver speeds through a crowded pedestrian market at 80 km/h on the wrong side of the road, narrowly missing shoppers and forcing vendors to jump out of the way. Under which section of the Bharatiya Nyaya Sanhita, 2023 is he prosecuted for rash driving on a public way?",
+    "options": [
+      "BNS Section 281 (Rash driving or riding on a public way)",
+      "BNS Section 279",
+      "BNS Section 106",
+      "BNS Section 290"
+    ],
+    "answer": "BNS Section 281 (Rash driving or riding on a public way)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 281 replaces Section 279 of the IPC for driving or riding rashly or negligently on a public way so as to endanger human life."
+  },
+  {
+    "id": "scen-ch15-02",
+    "section": "bns-274",
+    "chapter": "XV",
+    "scenario": "A dairy processor adulterates hundreds of liters of milk with chemical detergents and synthetic starch to increase volume before selling it to local grocery stores. Which BNS section penalizes the adulteration of food or drink intended for sale?",
+    "options": [
+      "BNS Section 274 (Adulteration of food or drink intended for sale)",
+      "BNS Section 276 (Adulteration of drugs)",
+      "BNS Section 280 (Noxious atmosphere)",
+      "BNS Section 271 (Infectious disease)"
+    ],
+    "answer": "BNS Section 274 (Adulteration of food or drink intended for sale)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 274 replaces Section 272 of the IPC, punishing anyone who adulterates food or drink intended for sale so as to make it noxious, with imprisonment up to 6 months or fine up to Rs. 5,000."
+  },
+  {
+    "id": "scen-ch15-03",
+    "section": "bns-294",
+    "chapter": "XV",
+    "scenario": "Under BNS Section 294 (formerly IPC Section 293), what is the age threshold below which the sale, distribution, or exhibition of obscene books or objects to a person is specifically criminalized?",
+    "options": [
+      "Under 18 years of age (aligned with the universal age of majority)",
+      "Under 20 years of age",
+      "Under 16 years of age",
+      "Under 21 years of age"
+    ],
+    "answer": "Under 18 years of age (aligned with the universal age of majority)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 294 modernized the provision by setting the threshold strictly at under 18 years of age (minor), whereas IPC Section 293 had historically specified 'under the age of twenty years'."
+  },
+  {
+    "id": "scen-ch16-01",
+    "section": "bns-299",
+    "chapter": "XVI",
+    "scenario": "A podcaster produces an inflammatory video with deliberate and malicious intent to insult the core religious tenets of a community and circulate it to provoke communal discord. Under which section of BNS (formerly IPC Section 295A) can he be prosecuted?",
+    "options": [
+      "BNS Section 299 (Deliberate and malicious acts intended to outrage religious feelings)",
+      "BNS Section 295A",
+      "BNS Section 302",
+      "BNS Section 196"
+    ],
+    "answer": "BNS Section 299 (Deliberate and malicious acts intended to outrage religious feelings)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 299 replaces Section 295A of the IPC for deliberate and malicious acts intended to outrage religious feelings of any class by insulting its religion or religious beliefs."
+  },
+  {
+    "id": "scen-ch16-02",
+    "section": "bns-302",
+    "chapter": "XVI",
+    "scenario": "Section 302 of the Bharatiya Nyaya Sanhita, 2023 deals with which of the following offences?",
+    "options": [
+      "Uttering words or making gestures with deliberate intent to wound religious feelings of any person",
+      "Punishment for murder",
+      "Defiling places of worship",
+      "Criminal breach of trust"
+    ],
+    "answer": "Uttering words or making gestures with deliberate intent to wound religious feelings of any person",
+    "correctIndex": 0,
+    "explanation": "Under the BNS, Section 302 replaces IPC Section 298 (wounding religious feelings). Punishment for murder has been moved to BNS Section 103, making this one of the most prominent section number changes in the new Sanhita."
+  },
+  {
+    "id": "scen-ch16-03",
+    "section": "bns-300",
+    "chapter": "XVI",
+    "scenario": "A group of protestors barges into a prayer hall during Sunday morning worship, shouting slogans, blasting air horns, and physically disrupting the congregation. Which section of BNS penalizes voluntarily causing disturbance to an assembly lawfully engaged in religious worship?",
+    "options": [
+      "BNS Section 300 (Disturbing religious assembly)",
+      "BNS Section 296",
+      "BNS Section 189",
+      "BNS Section 301"
+    ],
+    "answer": "BNS Section 300 (Disturbing religious assembly)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 300 replaces IPC Section 296, punishing anyone who voluntarily causes disturbance to any assembly lawfully engaged in the performance of religious worship or ceremonies with imprisonment up to 1 year, or fine, or both."
+  },
+  {
+    "id": "scen-ch17-01",
+    "section": "bns-304",
+    "chapter": "XVII",
+    "scenario": "Two men on a motorcycle pull up beside a pedestrian walking on the footpath, suddenly and forcefully rip a gold chain from her neck, and accelerate away before she can react. Under which newly introduced section of the BNS is this offence codified as snatching?",
+    "options": [
+      "BNS Section 304 (Snatching)",
+      "BNS Section 303 (Theft)",
+      "BNS Section 309 (Robbery)",
+      "BNS Section 308 (Extortion)"
+    ],
+    "answer": "BNS Section 304 (Snatching)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 304 is a brand-new offence created in the BNS (having no direct IPC predecessor), specifically defining snatching as suddenly, quickly, or forcibly seizing or taking away movable property, punishable with imprisonment up to 3 years and fine."
+  },
+  {
+    "id": "scen-ch17-02",
+    "section": "bns-303",
+    "chapter": "XVII",
+    "scenario": "A destitute youth is caught stealing a bag of rice worth Rs. 1,200 from an open market stall. It is his first offence, and upon apprehension, the rice is restored intact to the shopkeeper. Under the proviso to BNS Section 303(2), what penalty may the court impose?",
+    "options": [
+      "Community service",
+      "Mandatory 3 years rigorous imprisonment",
+      "Detention without trial for 6 months",
+      "A non-compoundable fine of Rs. 25,000"
+    ],
+    "answer": "Community service",
+    "correctIndex": 0,
+    "explanation": "Under the progressive proviso to BNS Section 303(2), where the value of stolen property is less than Rs. 5,000 and the offender is convicted for the first time, the court may sentence him to community service upon return of the property or payment of its value."
+  },
+  {
+    "id": "scen-ch17-03",
+    "section": "bns-318",
+    "chapter": "XVII",
+    "scenario": "A fraudulent real estate promoter collects Rs. 25 lakhs from homebuyers by showing forged development permits and bogus architectural drawings, dishonestly inducing them to transfer their life savings. Which section of BNS replaces the historic IPC Section 420 for cheating and dishonestly inducing delivery of property?",
+    "options": [
+      "BNS Section 318(4) (Cheating and dishonestly inducing delivery of property)",
+      "BNS Section 420",
+      "BNS Section 315",
+      "BNS Section 308"
+    ],
+    "answer": "BNS Section 318(4) (Cheating and dishonestly inducing delivery of property)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 318 consolidates IPC Sections 415, 417, 418, and 420. The famous offence of cheating and dishonestly inducing delivery of property (formerly IPC 420) is now codified under BNS Section 318(4), punishable with imprisonment up to 7 years and fine."
+  },
+  {
+    "id": "scen-ch17-04",
+    "section": "bns-316",
+    "chapter": "XVII",
+    "scenario": "A branch manager of a nationalized bank siphons Rs. 5 crores from depositors' fixed deposit accounts into his brother's trading account. Under BNS Section 316 (formerly IPC Section 409), what maximum punishment can be awarded for criminal breach of trust by a banker or public servant?",
+    "options": [
+      "Imprisonment for life, or imprisonment up to 10 years, and fine",
+      "Imprisonment up to 3 years and fine",
+      "Imprisonment up to 5 years only",
+      "Community service for 1 year"
+    ],
+    "answer": "Imprisonment for life, or imprisonment up to 10 years, and fine",
+    "correctIndex": 0,
+    "explanation": "BNS Section 316 consolidates IPC Sections 407, 408, and 409. Criminal breach of trust by a public servant, banker, merchant, factor, broker, attorney or agent carries imprisonment for life or imprisonment of either description up to 10 years, and fine."
+  },
+  {
+    "id": "scen-ch17-05",
+    "section": "bns-311",
+    "chapter": "XVII",
+    "scenario": "During an armed bank hold-up, one of the robbers brandishes a loaded pistol and strikes a security guard on the head with the butt, causing a fractured skull. Under BNS Section 311 (formerly IPC Section 397), what is the mandatory minimum sentence of rigorous imprisonment?",
+    "options": [
+      "Not less than 7 years rigorous imprisonment",
+      "Not less than 3 years imprisonment",
+      "Not less than 10 years imprisonment",
+      "Not less than 5 years imprisonment"
+    ],
+    "answer": "Not less than 7 years rigorous imprisonment",
+    "correctIndex": 0,
+    "explanation": "BNS Section 311 replaces IPC Section 397, imposing a non-discretionary mandatory minimum sentence of not less than 7 years rigorous imprisonment on any offender who uses a deadly weapon or causes grievous hurt while committing robbery or dacoity."
+  },
+  {
+    "id": "scen-ch17-06",
+    "section": "bns-331",
+    "chapter": "XVII",
+    "scenario": "At 2:00 AM, burglars pick the deadbolt lock of an unoccupied villa, enter through the rear door, and steal jewelry worth Rs. 10 lakhs. Under BNS Section 331, which replaced IPC Sections 449-458, this offence is classified as:",
+    "options": [
+      "House-trespass or house-breaking by night in order to commit theft",
+      "Simple mischief under Section 324",
+      "Public nuisance under Section 270",
+      "Snatching under Section 304"
+    ],
+    "answer": "House-trespass or house-breaking by night in order to commit theft",
+    "correctIndex": 0,
+    "explanation": "BNS Section 331 consolidates the complex 9 sections of IPC (449-458) into an aggravated hierarchy, specifically penalizing house-breaking by night to commit an offence with enhanced imprisonment up to 14 years and fine."
   }
 ]
