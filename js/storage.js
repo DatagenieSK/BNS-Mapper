@@ -10,7 +10,9 @@ const STORAGE_KEYS = {
   COMPARE: 'bns_mapper_compare',
   STATUTE: 'bns_mapper_statute',
   QUIZ_STATS: 'bns_mapper_quiz_stats',
-  LEITNER_BOXES: 'bns_mapper_leitner_boxes'
+  LEITNER_BOXES: 'bns_mapper_leitner_boxes',
+  TOUR_COMPLETED: 'bns_mapper_tour_completed',
+  SPLASH_SESSION: 'bns_mapper_splash_shown'
 };
 
 export const DIRECTIONS = {
@@ -342,5 +344,51 @@ export const storage = {
     try {
       localStorage.setItem(STORAGE_KEYS.QUIZ_STATS, JSON.stringify(stats));
     } catch (e) {}
+  },
+
+  // --- Onboarding Tour State ---
+  getTourCompleted() {
+    try {
+      return localStorage.getItem(STORAGE_KEYS.TOUR_COMPLETED) === 'true';
+    } catch (e) {
+      return false;
+    }
+  },
+
+  setTourCompleted(completed = true) {
+    try {
+      localStorage.setItem(STORAGE_KEYS.TOUR_COMPLETED, completed ? 'true' : 'false');
+    } catch (e) {}
+  },
+
+  // --- Session Splash State ---
+  isSplashNeeded() {
+    try {
+      if (!window.sessionStorage) return true;
+      return sessionStorage.getItem(STORAGE_KEYS.SPLASH_SESSION) !== 'true';
+    } catch (e) {
+      return true;
+    }
+  },
+
+  markSplashShown() {
+    try {
+      if (window.sessionStorage) {
+        sessionStorage.setItem(STORAGE_KEYS.SPLASH_SESSION, 'true');
+      }
+    } catch (e) {}
+  },
+
+  // --- Low-End Device Detection ---
+  isLowTierDevice() {
+    try {
+      if (typeof navigator === 'undefined') return false;
+      const isLowMemory = navigator.deviceMemory && navigator.deviceMemory < 4;
+      const isLowCores = navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4;
+      const isSaveData = navigator.connection && navigator.connection.saveData === true;
+      return Boolean(isLowMemory || isLowCores || isSaveData);
+    } catch (e) {
+      return false;
+    }
   }
 };

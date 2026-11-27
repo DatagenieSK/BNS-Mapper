@@ -1,14 +1,16 @@
 /**
- * Service Worker for BNS Mapper PWA (Round 1 Upgrade)
- * Caches static shell, styles, scripts, chapters index, and chapter datasets for offline study.
+ * Service Worker for BNS Mapper PWA (Frontend Elevation v11)
+ * Caches static shell, design tokens, styles, scripts, chapters index, and chapter datasets for offline study.
  */
 
-const CACHE_NAME = 'bns-mapper-v10';
+const CACHE_NAME = 'bns-mapper-v11';
 const STATIC_ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './assets/favicon.svg',
+  './assets/og-preview.svg',
+  './css/tokens.css',
   './css/main.css',
   './css/print.css',
   './js/app.js',
@@ -47,7 +49,14 @@ const STATIC_ASSETS = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS)).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(STATIC_ASSETS))
+      .then(() => self.skipWaiting())
+      .then(() => {
+        self.clients.matchAll({ includeUncontrolled: true, type: 'window' }).then(clients => {
+          clients.forEach(client => client.postMessage({ type: 'OFFLINE_READY' }));
+        });
+      })
   );
 });
 

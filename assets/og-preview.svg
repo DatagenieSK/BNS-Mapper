@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A1510"/>
+      <stop offset="100%" stop-color="#0E0C09"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#E58650"/>
+      <stop offset="100%" stop-color="#F29966"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle Legal Pattern Grid -->
+  <g stroke="#ffffff" stroke-opacity="0.04" stroke-width="1">
+    <line x1="0" y1="105" x2="1200" y2="105"/>
+    <line x1="0" y1="210" x2="1200" y2="210"/>
+    <line x1="0" y1="315" x2="1200" y2="315"/>
+    <line x1="0" y1="420" x2="1200" y2="420"/>
+    <line x1="0" y1="525" x2="1200" y2="525"/>
+    <line x1="200" y1="0" x2="200" y2="630"/>
+    <line x1="400" y1="0" x2="400" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="800" y1="0" x2="800" y2="630"/>
+    <line x1="1000" y1="0" x2="1000" y2="630"/>
+  </g>
+
+  <!-- Watermark Section Sign -->
+  <text x="960" y="440" font-family="'Charter', 'Georgia', serif" font-size="420" font-weight="700" fill="#ffffff" fill-opacity="0.03" text-anchor="middle">§</text>
+
+  <!-- Brand Block -->
+  <g transform="translate(100, 110)">
+    <!-- Scales Icon -->
+    <g transform="translate(0, 0)">
+      <circle cx="28" cy="28" r="28" fill="#E58650" fill-opacity="0.15"/>
+      <path d="M28 14v28M14 20h28M14 20l-6 12h12l-6-12zm28 0l-6 12h12l-6-12z" stroke="#E58650" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </g>
+
+    <text x="74" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF" letter-spacing="0.5">BNS MAPPER</text>
+    <text x="74" y="46" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="500" fill="#BCB6AC">CRIMINAL LAWS TRANSITION NAVIGATOR</text>
+
+    <!-- Main Title -->
+    <text x="0" y="150" font-family="'Charter', 'Georgia', serif" font-size="54" font-weight="700" fill="#F2EFEA">
+      The Complete 358-Section
+    </text>
+    <text x="0" y="214" font-family="'Charter', 'Georgia', serif" font-size="54" font-weight="700" fill="url(#accentGrad)">
+      IPC ↔ Bharatiya Nyaya Sanhita
+    </text>
+    <text x="0" y="270" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="400" fill="#BCB6AC">
+      Instant search, punishment comparisons, quiz practice &amp; gazette verification.
+    </text>
+  </g>
+
+  <!-- Interactive Card Mockup -->
+  <g transform="translate(100, 430)" filter="url(#shadow)">
+    <!-- Pill card -->
+    <rect width="1000" height="110" rx="16" fill="#181D24" stroke="#333E50" stroke-width="1.5"/>
+    
+    <g transform="translate(40, 36)">
+      <text x="0" y="0" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="700" fill="#858076" letter-spacing="1">OLD LAW (1860)</text>
+      <text x="0" y="38" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="34" font-weight="700" fill="#F2EFEA">IPC § 302</text>
+    </g>
+
+    <g transform="translate(360, 52)">
+      <circle cx="28" cy="8" r="24" fill="#242B37"/>
+      <path d="M20 8h16M30 2l6 6-6 6" stroke="#E58650" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </g>
+
+    <g transform="translate(480, 36)">
+      <text x="0" y="0" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="700" fill="#E58650" letter-spacing="1">NEW SANHITA (2023)</text>
+      <text x="0" y="38" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="34" font-weight="700" fill="#E58650">BNS § 103(1)</text>
+    </g>
+
+    <g transform="translate(800, 42)">
+      <rect width="150" height="34" rx="17" fill="#1B293E" stroke="#2D4263"/>
+      <text x="75" y="22" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="700" fill="#96BDED" text-anchor="middle">RENUMBERED</text>
+    </g>
+  </g>
+</svg>

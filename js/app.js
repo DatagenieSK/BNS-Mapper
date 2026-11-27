@@ -1,7 +1,7 @@
 /**
- * Application Bootstrap for BNS Mapper (Round 1 Upgrade)
- * Loads data/chapters.json, fetches and merges all chapter datasets dynamically,
- * registers service worker with chapter caching, and initializes routing.
+ * Application Bootstrap for BNS Mapper (Frontend Elevation)
+ * Real chapter fetch progress tracking, command palette, shortcuts,
+ * view transitions, offline caching notifications, and accessibility enhancements.
  */
 
 import { storage, DIRECTIONS, STATUTES } from './storage.js';
@@ -18,18 +18,35 @@ async function bootstrap() {
   const container = document.getElementById('app');
   ui.init(container);
 
+  const isFirstVisit = storage.isSplashNeeded();
+  const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isFastExit = !isFirstVisit || prefersReducedMotion || storage.isLowTierDevice();
+
+  if (isFastExit) {
+    ui.updateSplashProgress(100, 'Ready');
+    setTimeout(() => ui.dismissSplash(), 220);
+  } else {
+    ui.updateSplashProgress(15, 'Indexing statutory chapters...');
+  }
+
   // Register Service Worker for PWA Offline Support
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js').then((reg) => {
-        console.log('BNS Mapper Service Worker registered:', reg.scope);
+        // SW registered
       }).catch((err) => {
         console.warn('Service Worker registration skipped:', err);
       });
     });
+
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'OFFLINE_READY') {
+        ui.showToast('Offline ready: All chapters and sections cached locally', 'success');
+      }
+    });
   }
 
-  // Fetch Chapters index and merge chapter files
+  // Fetch Chapters index and merge chapter files with live progress
   let ipcSections = [];
   let chaptersIndex = [];
   let bnssSections = [], bsaSections = [], quizScenarios = [], omittedIpc = [];
@@ -47,10 +64,21 @@ async function bootstrap() {
       chaptersIndex = await chaptersRes.json();
       ui.setChaptersIndex(chaptersIndex);
 
-      // Fetch each chapter file listed in chapters.json in parallel
+      let loadedCount = 0;
+      const totalChapters = chaptersIndex.length;
+
+      // Fetch each chapter file listed in chapters.json in parallel while updating progress
       const chapterFetches = chaptersIndex.map(ch =>
         fetch(`./data/chapters/${ch.file}`)
           .then(r => r.ok ? r.json() : [])
+          .then(data => {
+            loadedCount++;
+            if (!isFastExit) {
+              const pct = 20 + Math.round((loadedCount / totalChapters) * 65);
+              ui.updateSplashProgress(pct, `Loading Chapter ${ch.chapter} of ${totalChapters} (${ch.title})...`);
+            }
+            return data;
+          })
           .catch(() => [])
       );
 
@@ -85,7 +113,6 @@ async function bootstrap() {
       const fallbackRes = await fetch('./data/sections.json');
       if (fallbackRes.ok) {
         const raw = await fallbackRes.json();
-        // Normalize any old single string format to array
         ipcSections = raw.map(s => ({
           ...s,
           bns: Array.isArray(s.bns) ? s.bns : [s.bns],
@@ -105,7 +132,12 @@ async function bootstrap() {
         <p>Could not load legal datasets. If running locally, please serve through an HTTP server (e.g. <code>npx serve</code>).</p>
       </div>
     `;
+    ui.dismissSplash();
     return;
+  }
+
+  if (!isFastExit) {
+    ui.updateSplashProgress(92, 'Building instant Fuse search index...');
   }
 
   // Initialize Search & Quiz Engines
@@ -114,7 +146,7 @@ async function bootstrap() {
   searchEngine.init(ipcSections, bnssSections, bsaSections, currentDirection, currentStatute);
   quizEngine.init(searchEngine.getAllSectionsCombined(), quizScenarios);
 
-  // Setup Router
+  // Setup Router with deep-linking & View Transitions
   appRouter = new Router();
 
   appRouter
@@ -150,7 +182,16 @@ async function bootstrap() {
     });
 
   bindGlobalControls();
+  ui.initCommandPalette();
+  ui.initShortcutsModal();
+
   appRouter.handleRouting();
+
+  if (!isFastExit) {
+    setTimeout(() => {
+      ui.dismissSplash();
+    }, 280);
+  }
 }
 
 function bindGlobalControls() {
@@ -167,7 +208,7 @@ function bindGlobalControls() {
       next = isDark ? 'light' : 'dark';
     }
     storage.setTheme(next);
-    ui.showToast(`Switched to ${next} theme`);
+    ui.showToast(`Switched to ${next} theme`, 'info');
     updateThemeIcon();
   };
 
@@ -184,6 +225,23 @@ function bindGlobalControls() {
     });
   }
   updateThemeIcon();
+
+  // Sticky header scrolled state
+  window.addEventListener('scroll', () => {
+    const header = document.querySelector('.site-header');
+    if (header) {
+      header.classList.toggle('scrolled', window.scrollY > 10);
+    }
+  }, { passive: true });
+
+  // Update bottom nav glider indicator on route changes
+  window.addEventListener('route-changed', () => {
+    ui.updateBottomNavGlider();
+  });
+  window.addEventListener('resize', () => {
+    ui.updateBottomNavGlider();
+  });
+  setTimeout(() => ui.updateBottomNavGlider(), 100);
 
   // Statute Switcher Tabs
   const statuteBtns = document.querySelectorAll('.statute-tab-btn');
@@ -212,7 +270,7 @@ function bindGlobalControls() {
       let label = 'IPC ↔ BNS';
       if (s === STATUTES.CRPC_BNSS) label = 'CrPC ↔ BNSS';
       else if (s === STATUTES.IEA_BSA) label = 'IEA ↔ BSA';
-      ui.showToast(`Active Statute: ${label}`);
+      ui.showToast(`Active Statute: ${label}`, 'info');
 
       const hash = window.location.hash || '#/';
       if (hash === '#/' || hash.startsWith('#/search')) {
@@ -246,7 +304,7 @@ function bindGlobalControls() {
       storage.setDirection(dir);
       searchEngine.setDirection(dir);
       updateDirectionUI(dir);
-      ui.showToast(`Mapping direction: ${dir === DIRECTIONS.IPC_TO_BNS ? 'Old → New' : 'New → Old'}`);
+      ui.showToast(`Mapping direction: ${dir === DIRECTIONS.IPC_TO_BNS ? 'Old → New' : 'New → Old'}`, 'info');
 
       const hash = window.location.hash || '#/';
       if (hash === '#/' || hash.startsWith('#/search')) {
@@ -259,9 +317,22 @@ function bindGlobalControls() {
     });
   });
 
-  // Keyboard Shortcuts
+  // Power-User Keyboard Shortcuts
+  let gPressed = false;
+  let gTimer = null;
+
   window.addEventListener('keydown', (e) => {
-    if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+    const isInputActive = document.activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
+
+    // Command Palette: ⌘K or Ctrl+K
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      ui.openCommandPalette();
+      return;
+    }
+
+    // Quick Search Focus: /
+    if (e.key === '/' && !isInputActive) {
       e.preventDefault();
       const searchInput = document.getElementById('search-input');
       if (searchInput) {
@@ -274,9 +345,26 @@ function bindGlobalControls() {
           if (input) input.focus();
         }, 120);
       }
+      return;
     }
 
+    // Help Shortcuts Modal: ?
+    if (e.key === '?' && !isInputActive) {
+      e.preventDefault();
+      ui.openShortcutsModal();
+      return;
+    }
+
+    // Theme Switch: t
+    if (e.key.toLowerCase() === 't' && !isInputActive) {
+      toggleThemeAction();
+      return;
+    }
+
+    // Escape: close modal or clear search
     if (e.key === 'Escape') {
+      ui.closeCommandPalette();
+      ui.closeShortcutsModal();
       const searchInput = document.getElementById('search-input');
       if (searchInput && document.activeElement === searchInput) {
         if (searchInput.value) {
@@ -285,6 +373,27 @@ function bindGlobalControls() {
         } else {
           searchInput.blur();
         }
+      }
+      return;
+    }
+
+    // Multi-key sequences: g + q, g + c, g + w, g + s
+    if (!isInputActive) {
+      if (e.key.toLowerCase() === 'g') {
+        gPressed = true;
+        clearTimeout(gTimer);
+        gTimer = setTimeout(() => { gPressed = false; }, 900);
+        return;
+      }
+
+      if (gPressed) {
+        gPressed = false;
+        clearTimeout(gTimer);
+        const k = e.key.toLowerCase();
+        if (k === 'q') { window.location.hash = '#/quiz'; return; }
+        if (k === 'c') { window.location.hash = '#/chapters'; return; }
+        if (k === 'w') { window.location.hash = '#/whats-new'; return; }
+        if (k === 's') { window.location.hash = '#/'; return; }
       }
     }
   });

@@ -2,15 +2,35 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>BNS Mapper — IPC to BNS Law Navigator</title>
   <meta name="description" content="Instant search and side-by-side transition mapper from IPC, CrPC, and Evidence Act to Bharatiya Nyaya Sanhita (BNS 2023), BNSS, and BSA for law students in India." />
-  <meta name="theme-color" content="#883B1B" />
+  
+  <!-- Theme Color for Light and Dark system UI -->
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FDFBF7" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111418" />
+
+  <!-- Open Graph & Social Cards -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="BNS Mapper" />
+  <meta property="og:title" content="BNS Mapper — IPC to BNS Criminal Laws Navigator" />
+  <meta property="og:description" content="Instant search, side-by-side punishment comparisons, quiz practice, and gazette verification for all 358 sections of Bharatiya Nyaya Sanhita, 2023." />
+  <meta property="og:image" content="./assets/og-preview.svg" />
+  <meta property="og:url" content="https://datageniesk.github.io/BNS-Mapper/" />
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="BNS Mapper — IPC to BNS Law Navigator" />
+  <meta name="twitter:description" content="Instant transition mapping from IPC to Bharatiya Nyaya Sanhita (BNS 2023) across all 358 sections." />
+  <meta name="twitter:image" content="./assets/og-preview.svg" />
+
+  <!-- Icons and Manifest -->
   <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
   <link rel="apple-touch-icon" href="./assets/favicon.svg" />
   <link rel="manifest" href="./manifest.json" />
 
   <!-- Stylesheets -->
+  <link rel="stylesheet" href="./css/tokens.css" />
   <link rel="stylesheet" href="./css/main.css" />
   <link rel="stylesheet" href="./css/print.css" media="print" />
 
@@ -21,6 +41,68 @@
   <!-- Accessible Skip Link -->
   <a href="#app" class="skip-link">Skip to main content</a>
 
+  <!-- Screen Reader Live Announcements -->
+  <div id="sr-announcements" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Real First-Load Splash Loader -->
+  <div id="splash-loader" class="splash-loader" role="progressbar" aria-label="Loading BNS statutory dataset" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+    <div class="splash-card">
+      <!-- Scales & Section Symbol Stroke Animation -->
+      <div class="splash-icon-wrap" aria-hidden="true">
+        <svg class="splash-svg" viewBox="0 0 80 80" width="80" height="80">
+          <!-- Scales of Justice with animated stroke -->
+          <circle class="splash-path splash-glow-circle" cx="40" cy="40" r="36" />
+          <path class="splash-path splash-stem" d="M40 16 v48 M24 24 h32" />
+          <path class="splash-path splash-pan-left" d="M24 24 l-10 16 h20 l-10 -16 z" />
+          <path class="splash-path splash-pan-right" d="M56 24 l-10 16 h20 l-10 -16 z" />
+          <path class="splash-path splash-base" d="M30 64 h20" />
+          <!-- Central Section Mark -->
+          <text x="40" y="47" class="splash-sec-mark" text-anchor="middle">§</text>
+        </svg>
+      </div>
+
+      <div class="splash-brand-text">
+        <h2 class="splash-title">Bharatiya Nyaya Sanhita</h2>
+        <span class="splash-subtitle">358 Sections &bull; 20 Chapters &bull; Criminal Law Transition</span>
+      </div>
+
+      <!-- Departure Board Number Flip (IPC 302 -> BNS 103) -->
+      <div class="departure-board" aria-label="Section transition animation">
+        <div class="board-column">
+          <span class="board-code-label">OLD CODE</span>
+          <div class="board-tiles">
+            <span class="flip-tile" data-flip-digit="3">3</span>
+            <span class="flip-tile" data-flip-digit="0">0</span>
+            <span class="flip-tile" data-flip-digit="2">2</span>
+          </div>
+          <span class="board-statute-tag">IPC § 302</span>
+        </div>
+
+        <div class="board-arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 12h14M13 5l7 7-7 7"/>
+          </svg>
+        </div>
+
+        <div class="board-column">
+          <span class="board-code-label">NEW SANHITA</span>
+          <div class="board-tiles bns-tiles">
+            <span class="flip-tile new-tile" data-flip-digit="1">1</span>
+            <span class="flip-tile new-tile" data-flip-digit="0">0</span>
+            <span class="flip-tile new-tile" data-flip-digit="3">3</span>
+          </div>
+          <span class="board-statute-tag accent-tag">BNS § 103(1)</span>
+        </div>
+      </div>
+
+      <!-- Real Loading Progress Bar & Status Text -->
+      <div class="splash-progress-track">
+        <div id="splash-progress-bar" class="splash-progress-fill"></div>
+      </div>
+      <div id="splash-status-text" class="splash-status-text">Initializing legal index...</div>
+    </div>
+  </div>
+
   <!-- Disclaimer Banner -->
   <aside class="disclaimer-banner" role="alert" aria-label="Sample data notice">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -28,11 +110,16 @@
       <line x1="12" y1="9" x2="12" y2="13"/>
       <line x1="12" y1="17" x2="12.01" y2="17"/>
     </svg>
-    <span>Sample data &mdash; verify against the official gazette before relying on it.</span>
+    <span>Sample data &mdash; verify against the official gazette before relying on it for legal proceedings.</span>
   </aside>
 
   <!-- Site Header -->
   <header class="site-header" role="banner">
+    <!-- Reading Progress Indicator (Visible on section detail views) -->
+    <div id="reading-progress-track" class="reading-progress-track" aria-hidden="true">
+      <div id="reading-progress-bar" class="reading-progress-bar"></div>
+    </div>
+
     <div class="header-container">
       <div class="brand-group">
         <a href="#/" class="brand-link" aria-label="BNS Mapper Home">
@@ -92,10 +179,42 @@
 
       <!-- Header Action Controls -->
       <div class="header-actions">
+        <!-- Command Palette Trigger Button -->
+        <button
+          type="button"
+          id="cmd-palette-btn"
+          class="cmd-palette-btn"
+          title="Open Command Palette (Ctrl+K or ⌘K)"
+          aria-label="Open Command Palette"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span class="cmd-label-text">Search...</span>
+          <span class="cmd-shortcut-hint"><kbd class="kbd-meta">⌘</kbd><kbd>K</kbd></span>
+        </button>
+
+        <!-- Keyboard Shortcuts Help -->
+        <button
+          type="button"
+          id="shortcuts-help-btn"
+          class="icon-btn"
+          title="Keyboard shortcuts (?)"
+          aria-label="View keyboard shortcuts"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </button>
+
+        <!-- Theme Toggle Button -->
         <button
           type="button"
           id="theme-toggle-btn"
-          class="icon-btn"
+          class="icon-btn theme-toggle-btn"
           title="Toggle light/dark theme"
           aria-label="Toggle light and dark theme"
         >
@@ -130,8 +249,9 @@
     </noscript>
   </main>
 
-  <!-- Mobile Bottom Navigation Bar -->
+  <!-- Mobile Bottom Navigation Bar with Animated Glider Indicator -->
   <nav class="bottom-nav" aria-label="Mobile Navigation">
+    <div id="bottom-nav-indicator" class="bottom-nav-indicator" aria-hidden="true"></div>
     <a href="#/" class="bottom-nav-item active" data-route-link aria-label="Search and Explore">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <circle cx="11" cy="11" r="8"></circle>
@@ -185,11 +305,117 @@
       <div>
         <strong>BNS Mapper</strong> &mdash; Educational study aid for IPC, BNS, CrPC, BNSS, IEA, and BSA.
       </div>
-      <div>
-        Not legal advice &bull; Verified against the Gazette of India &bull; Open Source on GitHub
+      <div class="footer-links">
+        <button type="button" id="footer-tour-btn" class="footer-link-btn">Quick Tour</button> &bull;
+        <button type="button" id="footer-shortcuts-btn" class="footer-link-btn">Keyboard Shortcuts</button> &bull;
+        <a href="#/coverage">Gazette Verification (358/358)</a> &bull;
+        <span>Open Source on GitHub</span>
       </div>
     </div>
   </footer>
+
+  <!-- Command Palette Modal (Ctrl+K / ⌘K) -->
+  <div id="cmd-palette-modal" class="cmd-palette-backdrop" role="dialog" aria-modal="true" aria-label="Command Palette" style="display: none;">
+    <div class="cmd-palette-card">
+      <div class="cmd-input-wrap">
+        <svg class="cmd-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          type="text"
+          id="cmd-palette-input"
+          class="cmd-palette-input"
+          placeholder="Type a section, chapter, or command... (e.g. 302, snatching, quiz)"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <kbd class="cmd-esc-hint">ESC</kbd>
+      </div>
+
+      <div id="cmd-palette-results" class="cmd-palette-results" role="listbox">
+        <!-- Populated dynamically -->
+      </div>
+
+      <div class="cmd-palette-footer">
+        <div class="cmd-footer-hints">
+          <span><kbd>&uarr;</kbd><kbd>&darr;</kbd> to navigate</span>
+          <span><kbd>&crarr;</kbd> to select</span>
+          <span><kbd>ESC</kbd> to close</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keyboard Shortcuts Cheat-Sheet Modal -->
+  <div id="shortcuts-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="Keyboard Shortcuts" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Keyboard Shortcuts</h3>
+        <button type="button" id="close-shortcuts-modal-btn" class="icon-btn modal-close-btn" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="shortcuts-grid">
+        <div class="shortcut-row">
+          <span class="shortcut-desc">Focus Search Bar</span>
+          <span class="shortcut-keys"><kbd>/</kbd></span>
+        </div>
+        <div class="shortcut-row">
+          <span class="shortcut-desc">Open Command Palette</span>
+          <span class="shortcut-keys"><kbd class="kbd-meta">⌘</kbd><kbd>K</kbd> / <kbd>Ctrl</kbd><kbd>K</kbd></span>
+        </div>
+        <div class="shortcut-row">
+          <span class="shortcut-desc">Go to Quiz Mode</span>
+          <span class="shortcut-keys"><kbd>G</kbd> then <kbd>Q</kbd></span>
+        </div>
+        <div class="shortcut-row">
+          <span class="shortcut-desc">Go to Chapters Browser</span>
+          <span class="shortcut-keys"><kbd>G</kbd> then <kbd>C</kbd></span>
+        </div>
+        <div class="shortcut-row">
+          <span class="shortcut-desc">Go to What's New</span>
+          <span class="shortcut-keys"><kbd>G</kbd> then <kbd>W</kbd></span>
+        </div>
+        <div class="shortcut-row">
+          <span class="shortcut-desc">Go to Codification Coverage</span>
+          <span class="shortcut-keys"><kbd>G</kbd> then <kbd>S</kbd></span>
+        </div>
+        <div class="shortcut-row">
+          <span class="shortcut-desc">Toggle Light / Dark Theme</span>
+          <span class="shortcut-keys"><kbd>T</kbd></span>
+        </div>
+        <div class="shortcut-row">
+          <span class="shortcut-desc">Show Shortcuts Cheat Sheet</span>
+          <span class="shortcut-keys"><kbd>?</kbd></span>
+        </div>
+        <div class="shortcut-row">
+          <span class="shortcut-desc">Close Modals / Deselect</span>
+          <span class="shortcut-keys"><kbd>ESC</kbd></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onboarding Spotlight Tour Container -->
+  <div id="tour-spotlight-container" class="tour-spotlight-container" style="display: none;" aria-hidden="true">
+    <div id="tour-spotlight-hole" class="tour-spotlight-hole"></div>
+    <div id="tour-tooltip-card" class="tour-tooltip-card" role="dialog" aria-modal="true" aria-label="Feature Tour">
+      <div class="tour-step-badge">Step <span id="tour-current-step">1</span> of 3</div>
+      <h4 id="tour-step-title" class="tour-step-title">Instant Criminal Law Search</h4>
+      <p id="tour-step-desc" class="tour-step-desc">
+        Search across both old IPC sections and new Bharatiya Nyaya Sanhita provisions with zero latency. Toggle the arrow to map in either direction!
+      </p>
+      <div class="tour-actions">
+        <button type="button" id="tour-skip-btn" class="btn btn-outline" style="padding: 4px 12px; font-size: 0.8rem;">Skip Tour</button>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" id="tour-prev-btn" class="btn btn-outline" style="padding: 4px 12px; font-size: 0.8rem;">Back</button>
+          <button type="button" id="tour-next-btn" class="btn btn-primary" style="padding: 4px 14px; font-size: 0.8rem;">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Canvas for Celebratory Confetti & Streaks -->
+  <canvas id="confetti-canvas" class="confetti-canvas" aria-hidden="true"></canvas>
 
   <!-- App Bootstrap Module -->
   <script type="module" src="./js/app.js"></script>

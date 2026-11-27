@@ -69,9 +69,35 @@ export const ui = {
   },
 
   // -------------------------------------------------------------
-  // Toast Notifications
+  // Real Splash Loader Controller
   // -------------------------------------------------------------
-  showToast(message, duration = 2600) {
+  updateSplashProgress(pct, statusText) {
+    const fill = document.getElementById('splash-progress-fill');
+    const status = document.getElementById('splash-status-text');
+    if (fill) fill.style.width = `${Math.min(100, Math.max(0, pct))}%`;
+    if (status && statusText) status.textContent = statusText;
+  },
+
+  dismissSplash() {
+    const splash = document.getElementById('splash-screen');
+    if (!splash) return;
+    this.updateSplashProgress(100, 'Codification loaded');
+    storage.markSplashShown();
+    setTimeout(() => {
+      splash.classList.add('fade-out');
+      setTimeout(() => {
+        splash.remove();
+        if (!storage.getTourCompleted()) {
+          setTimeout(() => this.startTour(), 700);
+        }
+      }, 450);
+    }, 200);
+  },
+
+  // -------------------------------------------------------------
+  // Upgraded Stacking Toast Notifications
+  // -------------------------------------------------------------
+  showToast(message, type = 'info', duration = 2800) {
     let toastContainer = document.getElementById('toast-container');
     if (!toastContainer) {
       toastContainer = document.createElement('div');
@@ -83,20 +109,35 @@ export const ui = {
     }
 
     const toast = document.createElement('div');
-    toast.className = 'toast';
+    toast.className = `toast-item toast-${type}`;
+
+    let iconSvg = '';
+    if (type === 'success') {
+      iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>';
+    } else if (type === 'error') {
+      iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+    } else {
+      iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
+    }
+
     toast.innerHTML = `
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M20 6L9 17l-5-5"/>
-      </svg>
+      ${iconSvg}
       <span>${this.escapeHtml(message)}</span>
     `;
 
-    toastContainer.appendChild(toast);
-    setTimeout(() => {
+    toast.onclick = () => {
       toast.style.opacity = '0';
       toast.style.transform = 'translateY(8px)';
-      toast.style.transition = 'all 0.2s ease-out';
-      setTimeout(() => toast.remove(), 250);
+      setTimeout(() => toast.remove(), 200);
+    };
+
+    toastContainer.appendChild(toast);
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        setTimeout(() => toast.remove(), 250);
+      }
     }, duration);
   },
 
@@ -161,6 +202,8 @@ export const ui = {
     const counts = { all: allSections.length, renumbered: 0, modified: 0, new: 0, omitted: 0, split: 0, merged: 0 };
     allSections.forEach(s => { if (counts[s.change] !== undefined) counts[s.change]++; });
 
+    const sotd = this.getSectionOfTheDay();
+
     let statutePairName = 'IPC (1860) &harr; BNS (2023)';
     let primaryPlaceholder = isIpcToBns ? 'IPC number (e.g. 34, 76, 302)' : 'BNS number (e.g. 1, 4, 14, 103)';
     if (currentStatute === STATUTES.CRPC_BNSS) {
@@ -173,6 +216,13 @@ export const ui = {
 
     this.appContainer.innerHTML = `
       <section class="search-hero" aria-labelledby="hero-title">
+        <div class="hero-drifting-bg" aria-hidden="true">
+          <span class="drifting-glyph">§ 302</span>
+          <span class="drifting-glyph">§ 103</span>
+          <span class="drifting-glyph">§ 420</span>
+          <span class="drifting-glyph">§ 69</span>
+        </div>
+
         <div class="hero-morph-banner" aria-hidden="true">
           <span>Old Code:</span>
           <span id="hero-morph-old" class="morph-pill">IPC 1 to 5</span>
@@ -216,6 +266,17 @@ export const ui = {
             <span class="search-kbd-hint" title="Press / to focus">/</kbd></span>
           </div>
 
+          <div class="quick-chips-wrapper" aria-label="Popular searches">
+            <span class="quick-chip-label">Popular:</span>
+            <button class="quick-chip" data-quick-search="302">Murder (302)</button>
+            <button class="quick-chip" data-quick-search="snatching">Snatching (304)</button>
+            <button class="quick-chip" data-quick-search="376">Rape (376)</button>
+            <button class="quick-chip" data-quick-search="420">Cheating (420)</button>
+            <button class="quick-chip" data-quick-search="69">Deceitful Promise (§ 69)</button>
+            <button class="quick-chip" data-quick-search="hit and run">Hit &amp; Run</button>
+            <button class="quick-chip" data-quick-search="defamation">Defamation</button>
+          </div>
+
           <div class="filter-pills-row" role="radiogroup" aria-label="Filter by change type">
             ${['all', 'renumbered', 'modified', 'merged', 'split', 'new', 'omitted'].map(type => `
               <button
@@ -225,12 +286,51 @@ export const ui = {
                 aria-checked="${filterChange === type}"
               >
                 ${type.charAt(0).toUpperCase() + type.slice(1)}
-                <span class="filter-count">${counts[type] || 0}</span>
+                <span class="filter-count count-up-target" data-target="${counts[type] || 0}">${counts[type] || 0}</span>
               </button>
             `).join('')}
           </div>
         </div>
+
+        ${(!query && filterChange === 'all' && sotd) ? `
+          <div class="sotd-card" role="region" aria-label="Section of the Day">
+            <div>
+              <div class="sotd-badge-label">Section of the Day</div>
+              <div class="sotd-title">${this.formatSections(sotd.ipc, 'IPC')} &rarr; ${this.formatSections(sotd.bns, 'BNS')}: ${this.escapeHtml(sotd.title)}</div>
+              <p class="sotd-desc">${this.escapeHtml(sotd.explanation)}</p>
+            </div>
+            <a href="#/section/${sotd.id}" class="btn btn-primary" style="white-space: nowrap; font-size: 0.8rem; padding: 6px 14px;">
+              Explore &rarr;
+            </a>
+          </div>
+        ` : ''}
       </section>
+
+      ${(!query && filterChange === 'all') ? `
+        <section class="explainer-section" aria-label="How IPC became BNS">
+          <div class="explainer-header">
+            <h3>How the Indian Penal Code Became BNS</h3>
+            <p>Three core architectural shifts defining India's substantive criminal law transition</p>
+          </div>
+          <div class="explainer-steps">
+            <div class="explainer-step-card">
+              <div class="explainer-step-num">1</div>
+              <div class="explainer-step-title">Streamlined &amp; Consolidated</div>
+              <div class="explainer-step-text">511 sections pruned and renumbered into 358 cohesive sections across 20 thematic chapters, eliminating archaic colonial repetition.</div>
+            </div>
+            <div class="explainer-step-card">
+              <div class="explainer-step-num">2</div>
+              <div class="explainer-step-title">Modernized Offences</div>
+              <div class="explainer-step-text">Added modern statutory provisions: Snatching (§ 304), Organized Crime (§ 111), Terrorist Acts (§ 113), and Deceitful Promise of Marriage (§ 69).</div>
+            </div>
+            <div class="explainer-step-card">
+              <div class="explainer-step-num">3</div>
+              <div class="explainer-step-title">Community Service &amp; Gender Focus</div>
+              <div class="explainer-step-text">Introduced Community Service as a reformative penalty (§ 4) and instituted stringent priority protections for women and children (Chapter V).</div>
+            </div>
+          </div>
+        </section>
+      ` : ''}
 
       <section class="results-section" aria-live="polite">
         <div class="results-meta-bar">
@@ -461,7 +561,21 @@ export const ui = {
       });
     });
 
+    document.querySelectorAll('.quick-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const term = chip.getAttribute('data-quick-search');
+        if (input) {
+          input.value = term;
+          input.dispatchEvent(new Event('input'));
+          input.focus();
+        }
+      });
+    });
+
     this.bindCardActions();
+    this.initTypewriter();
+    this.initCardTilt();
+    this.initCountUp();
   },
 
   updateSearchResultsGrid(results, direction, query = '') {
@@ -511,6 +625,7 @@ export const ui = {
       }
       targetGrid.innerHTML = results.map(item => this.renderSectionCard(item, direction, query)).join('');
       this.bindCardActions();
+      this.initCardTilt();
     }
   },
 
@@ -578,6 +693,7 @@ export const ui = {
     const nextItem = curIndex < all.length - 1 ? all[curIndex + 1] : null;
 
     const chFullTitle = this.getChapterTitle(item.chapter);
+    const diff = this.computeTextDiff(item.old_text, item.new_text);
 
     this.appContainer.innerHTML = `
       <article class="detail-view" aria-labelledby="detail-title">
@@ -659,7 +775,7 @@ export const ui = {
                 <span class="badge" style="font-size: 0.65rem;">Repealed</span>
               </div>
               <div class="comparison-body">
-                <div class="law-text-content">${this.escapeHtml(item.old_text)}</div>
+                <div class="law-text-content">${diff.oldHtml}</div>
               </div>
             </div>
 
@@ -669,7 +785,7 @@ export const ui = {
                 <span class="badge badge-new" style="font-size: 0.65rem;">In Force</span>
               </div>
               <div class="comparison-body">
-                <div class="law-text-content">${this.escapeHtml(item.new_text)}</div>
+                <div class="law-text-content">${diff.newHtml}</div>
               </div>
             </div>
           </div>
@@ -768,6 +884,7 @@ export const ui = {
       };
     }
 
+    this.initReadingProgressBar();
     this.renderCompareTray();
   },
 
@@ -1246,7 +1363,7 @@ export const ui = {
     const progressPct = ((session.currentIndex) / session.questions.length) * 100;
 
     container.innerHTML = `
-      <div class="question-card" style="margin-top: 16px;">
+      <div class="question-card quiz-card-animated" style="margin-top: 16px;">
         <div class="quiz-header-bar">
           <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">
             QUESTION ${session.currentIndex + 1} OF ${session.questions.length}
@@ -1304,9 +1421,9 @@ export const ui = {
     document.querySelectorAll('.quiz-option-btn').forEach((b, i) => {
       b.disabled = true;
       if (i === question.correctIndex) {
-        b.classList.add('correct');
+        b.classList.add('correct', 'correct-reveal');
       } else if (i === selectedIdx && !isCorrect) {
-        b.classList.add('wrong');
+        b.classList.add('wrong', 'wrong-reveal');
       }
     });
 
@@ -1351,7 +1468,7 @@ export const ui = {
     const score = session.score;
     const pct = Math.round((score / total) * 100);
 
-    storage.recordQuizSession({
+    const savedStats = storage.recordQuizSession({
       score,
       total,
       mode: session.mode,
@@ -1367,25 +1484,43 @@ export const ui = {
       });
     }
 
+    if (pct >= 80 || (savedStats && savedStats.currentStreak >= 3)) {
+      this.triggerConfetti();
+    }
+
     container.innerHTML = `
-      <div class="question-card" style="text-align: center; padding: 40px 20px;">
+      <div class="question-card quiz-card-animated" style="text-align: center; padding: 40px 20px;">
         <h3 style="font-size: 2rem; margin-bottom: 8px;">Session Complete!</h3>
         <p style="margin-bottom: 24px;">Here is how you performed on this practice set:</p>
 
-        <div style="display: inline-flex; align-items: center; justify-content: center; width: 110px; height: 110px; border-radius: var(--radius-pill); background: var(--bg-subtle); border: 4px solid var(--accent); font-size: 2rem; font-weight: 700; color: var(--accent); margin-bottom: 20px;">
-          ${pct}%
+        <div style="position: relative; width: 120px; height: 120px; margin: 0 auto 20px;">
+          <svg width="120" height="120" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" stroke="var(--bg-muted)" stroke-width="8" fill="none" />
+            <circle id="quiz-score-circle" cx="50" cy="50" r="42" stroke="${pct >= 70 ? 'var(--color-success)' : 'var(--accent)'}" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="264" transform="rotate(-90 50 50)" style="transition: stroke-dashoffset 1s ease-out;" />
+          </svg>
+          <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; color: var(--text-primary);">
+            ${pct}%
+          </div>
         </div>
 
         <div style="font-size: 1.15rem; margin-bottom: 24px;">
           You got <strong>${score}</strong> out of <strong>${total}</strong> questions correct.
+          ${pct >= 80 ? '<div style="margin-top: 6px; color: var(--color-success); font-weight: 600;">Outstanding mastery! 🔥</div>' : ''}
         </div>
 
-        <div style="display: flex; justify-content: center; gap: 12px;">
+        <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
           <button id="retry-quiz-btn" class="btn btn-primary">Try Another Set</button>
           <a href="#/flashcards" class="btn btn-outline">Review with Flashcards</a>
         </div>
       </div>
     `;
+
+    setTimeout(() => {
+      const circle = document.getElementById('quiz-score-circle');
+      if (circle) {
+        circle.style.strokeDashoffset = String(264 - Math.round((264 * pct) / 100));
+      }
+    }, 60);
 
     const retryBtn = document.getElementById('retry-quiz-btn');
     if (retryBtn) {
@@ -1946,5 +2081,520 @@ export const ui = {
         this.renderCompareTray();
       };
     }
+  },
+
+  // -------------------------------------------------------------
+  // Dynamic Diff Highlighting
+  // -------------------------------------------------------------
+  computeTextDiff(oldText, newText) {
+    if (!oldText || !newText) return { oldHtml: this.escapeHtml(oldText), newHtml: this.escapeHtml(newText) };
+    const oldWords = oldText.split(/\s+/);
+    const newWords = newText.split(/\s+/);
+    const oldSet = new Set(oldWords.map(w => w.toLowerCase().replace(/[^a-z0-9]/g, '')));
+    const newSet = new Set(newWords.map(w => w.toLowerCase().replace(/[^a-z0-9]/g, '')));
+
+    const oldHtml = oldWords.map(w => {
+      const clean = w.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (clean && !newSet.has(clean) && oldWords.length < 120) {
+        return `<span class="diff-del">${this.escapeHtml(w)}</span>`;
+      }
+      return this.escapeHtml(w);
+    }).join(' ');
+
+    const newHtml = newWords.map(w => {
+      const clean = w.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (clean && !oldSet.has(clean) && newWords.length < 120) {
+        return `<span class="diff-ins">${this.escapeHtml(w)}</span>`;
+      }
+      return this.escapeHtml(w);
+    }).join(' ');
+
+    return { oldHtml, newHtml };
+  },
+
+  // -------------------------------------------------------------
+  // Reading Progress Bar
+  // -------------------------------------------------------------
+  initReadingProgressBar() {
+    const bar = document.getElementById('reading-progress');
+    if (!bar) return;
+    bar.classList.add('visible');
+
+    const onScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (totalHeight <= 0) {
+        bar.style.width = '0%';
+        return;
+      }
+      const scrolled = (window.scrollY / totalHeight) * 100;
+      bar.style.width = `${Math.min(100, Math.max(0, scrolled))}%`;
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  },
+
+  // -------------------------------------------------------------
+  // Section of the Day
+  // -------------------------------------------------------------
+  getSectionOfTheDay() {
+    const all = searchEngine.getAllSections();
+    if (!all || all.length === 0) return null;
+    const now = new Date();
+    const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+    const featuredPool = all.filter(s => ['bns-103', 'bns-304', 'bns-69', 'bns-111', 'bns-316', 'bns-189', 'bns-351', 'bns-14'].includes(s.id));
+    if (featuredPool.length > 0) {
+      return featuredPool[dayOfYear % featuredPool.length];
+    }
+    return all[dayOfYear % all.length];
+  },
+
+  // -------------------------------------------------------------
+  // Typewriter Placeholder
+  // -------------------------------------------------------------
+  initTypewriter() {
+    const searchInput = document.getElementById('search-input');
+    if (!searchInput) return;
+
+    const queries = ['302', 'murder', 'snatching', 'BNS 103', 'cheating', 'Section 69', 'affray', 'private defence'];
+    let queryIdx = 0;
+    let charIdx = 0;
+    let isDeleting = false;
+
+    const tick = () => {
+      if (document.activeElement === searchInput || searchInput.value) {
+        setTimeout(tick, 1000);
+        return;
+      }
+
+      const currentWord = queries[queryIdx];
+      if (isDeleting) {
+        charIdx--;
+      } else {
+        charIdx++;
+      }
+
+      searchInput.setAttribute('placeholder', `Try searching "${currentWord.substring(0, charIdx)}"...`);
+
+      let delta = isDeleting ? 50 : 110;
+      if (!isDeleting && charIdx === currentWord.length) {
+        delta = 2000;
+        isDeleting = true;
+      } else if (isDeleting && charIdx === 0) {
+        isDeleting = false;
+        queryIdx = (queryIdx + 1) % queries.length;
+        delta = 350;
+      }
+
+      setTimeout(tick, delta);
+    };
+
+    tick();
+  },
+
+  // -------------------------------------------------------------
+  // Desktop 3D Card Tilt
+  // -------------------------------------------------------------
+  initCardTilt() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (window.matchMedia && !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+    document.querySelectorAll('.section-card').forEach(card => {
+      card.onmousemove = (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        const rotateX = -(y / (rect.height / 2)) * 4.5;
+        const rotateY = (x / (rect.width / 2)) * 4.5;
+        card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-2px)`;
+      };
+      card.onmouseleave = () => {
+        card.style.transform = '';
+      };
+    });
+  },
+
+  // -------------------------------------------------------------
+  // Stats Count-Up Animation
+  // -------------------------------------------------------------
+  initCountUp() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const elements = document.querySelectorAll('.count-up-target');
+    if (!elements.length) return;
+
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const target = parseInt(el.getAttribute('data-target') || el.textContent, 10);
+          if (isNaN(target)) return;
+          obs.unobserve(el);
+
+          let current = 0;
+          const step = Math.max(1, Math.floor(target / 20));
+          const interval = setInterval(() => {
+            current += step;
+            if (current >= target) {
+              el.textContent = target;
+              clearInterval(interval);
+            } else {
+              el.textContent = current;
+            }
+          }, 25);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    elements.forEach(el => observer.observe(el));
+  },
+
+  // -------------------------------------------------------------
+  // Celebratory Canvas Confetti Burst Engine
+  // -------------------------------------------------------------
+  triggerConfetti() {
+    const canvas = document.getElementById('confetti-canvas');
+    if (!canvas) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const colors = ['#883B1B', '#D97706', '#19682C', '#2C4B75', '#5E328A', '#DC2626'];
+    const particleCount = 70;
+    const particles = [];
+
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: canvas.width / 2 + (Math.random() - 0.5) * 240,
+        y: canvas.height * 0.4 + (Math.random() - 0.5) * 120,
+        vx: (Math.random() - 0.5) * 15,
+        vy: -Math.random() * 12 - 4,
+        size: Math.random() * 8 + 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rotation: Math.random() * 360,
+        rotationSpeed: (Math.random() - 0.5) * 10,
+        opacity: 1
+      });
+    }
+
+    let animationId = null;
+    const start = performance.now();
+
+    const render = (time) => {
+      const elapsed = time - start;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      let alive = false;
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.35;
+        p.rotation += p.rotationSpeed;
+        p.opacity = Math.max(0, 1 - elapsed / 2200);
+
+        if (p.opacity > 0) {
+          alive = true;
+          ctx.save();
+          ctx.globalAlpha = p.opacity;
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.7);
+          ctx.restore();
+        }
+      });
+
+      if (alive && elapsed < 2300) {
+        animationId = requestAnimationFrame(render);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        cancelAnimationFrame(animationId);
+      }
+    };
+
+    requestAnimationFrame(render);
+  },
+
+  // -------------------------------------------------------------
+  // Command Palette (⌘K / Ctrl+K)
+  // -------------------------------------------------------------
+  initCommandPalette() {
+    const modal = document.getElementById('command-palette-modal');
+    const input = document.getElementById('cmd-input');
+    const resultsContainer = document.getElementById('cmd-results');
+    const triggerBtn = document.getElementById('command-palette-btn');
+
+    if (!modal || !input || !resultsContainer) return;
+
+    let selectedIndex = 0;
+    let currentItems = [];
+
+    const openPalette = () => {
+      modal.classList.add('open');
+      input.value = '';
+      input.focus();
+      renderItems('');
+    };
+
+    const closePalette = () => {
+      modal.classList.remove('open');
+    };
+
+    this.openCommandPalette = openPalette;
+    this.closeCommandPalette = closePalette;
+
+    if (triggerBtn) triggerBtn.onclick = openPalette;
+
+    modal.onclick = (e) => {
+      if (e.target === modal) closePalette();
+    };
+
+    const renderItems = (query) => {
+      const cleanQ = (query || '').trim().toLowerCase();
+      const allSecs = searchEngine.getAllSectionsCombined();
+      const items = [];
+
+      // Static navigation actions
+      const actions = [
+        { label: 'Go to Search & Explorer', hash: '#/', badge: 'Route' },
+        { label: 'Browse 20 Chapters', hash: '#/chapters', badge: 'Route' },
+        { label: 'What\'s New in BNS', hash: '#/whats-new', badge: 'Route' },
+        { label: 'Scenario Quiz & Practice', hash: '#/quiz', badge: 'Route' },
+        { label: 'Flashcards (Leitner System)', hash: '#/flashcards', badge: 'Route' },
+        { label: 'Side-by-Side Compare Mode', hash: '#/compare', badge: 'Route' },
+        { label: 'Codification & Verification Coverage', hash: '#/coverage', badge: 'Route' },
+        { label: 'My Saved Sections Cheat Sheet', hash: '#/bookmarks', badge: 'Route' }
+      ];
+
+      actions.forEach(a => {
+        if (!cleanQ || a.label.toLowerCase().includes(cleanQ)) {
+          items.push({ type: 'action', ...a });
+        }
+      });
+
+      // Search matching sections
+      if (cleanQ) {
+        const matches = allSecs.filter(s => {
+          const ipcMatch = Array.isArray(s.ipc) ? s.ipc.some(i => i.toLowerCase().includes(cleanQ)) : s.ipc?.toLowerCase().includes(cleanQ);
+          const bnsMatch = Array.isArray(s.bns) ? s.bns.some(b => b.toLowerCase().includes(cleanQ)) : s.bns?.toLowerCase().includes(cleanQ);
+          const titleMatch = s.title?.toLowerCase().includes(cleanQ);
+          return ipcMatch || bnsMatch || titleMatch;
+        }).slice(0, 10);
+
+        matches.forEach(s => {
+          items.push({
+            type: 'section',
+            label: `${this.formatSections(s.ipc, 'IPC')} → ${this.formatSections(s.bns, 'BNS')}: ${s.title}`,
+            hash: `#/section/${s.id}`,
+            badge: s.change
+          });
+        });
+      }
+
+      currentItems = items;
+      selectedIndex = 0;
+
+      if (items.length === 0) {
+        resultsContainer.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">No results found.</div>';
+        return;
+      }
+
+      resultsContainer.innerHTML = items.map((it, idx) => `
+        <div class="cmd-item ${idx === 0 ? 'selected' : ''}" data-idx="${idx}" data-hash="${it.hash}">
+          <div class="cmd-item-left">
+            <span>${this.escapeHtml(it.label)}</span>
+          </div>
+          <span class="cmd-item-badge">${this.escapeHtml(it.badge)}</span>
+        </div>
+      `).join('');
+
+      resultsContainer.querySelectorAll('.cmd-item').forEach(el => {
+        el.onmouseenter = () => {
+          resultsContainer.querySelectorAll('.cmd-item').forEach(c => c.classList.remove('selected'));
+          el.classList.add('selected');
+          selectedIndex = parseInt(el.getAttribute('data-idx'), 10);
+        };
+        el.onclick = () => {
+          window.location.hash = el.getAttribute('data-hash');
+          closePalette();
+        };
+      });
+    };
+
+    input.oninput = (e) => {
+      renderItems(e.target.value);
+    };
+
+    input.onkeydown = (e) => {
+      if (e.key === 'Escape') {
+        closePalette();
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (currentItems.length > 0) {
+          selectedIndex = (selectedIndex + 1) % currentItems.length;
+          updateSelected();
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (currentItems.length > 0) {
+          selectedIndex = (selectedIndex - 1 + currentItems.length) % currentItems.length;
+          updateSelected();
+        }
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (currentItems[selectedIndex]) {
+          window.location.hash = currentItems[selectedIndex].hash;
+          closePalette();
+        }
+      }
+    };
+
+    const updateSelected = () => {
+      const allEls = resultsContainer.querySelectorAll('.cmd-item');
+      allEls.forEach((el, idx) => {
+        if (idx === selectedIndex) {
+          el.classList.add('selected');
+          el.scrollIntoView({ block: 'nearest' });
+        } else {
+          el.classList.remove('selected');
+        }
+      });
+    };
+  },
+
+  // -------------------------------------------------------------
+  // Keyboard Shortcuts Modal (? key)
+  // -------------------------------------------------------------
+  initShortcutsModal() {
+    const modal = document.getElementById('shortcuts-modal');
+    const closeBtn = document.getElementById('close-shortcuts-btn');
+    const triggerBtn = document.getElementById('shortcuts-help-btn');
+
+    if (!modal) return;
+
+    const openModal = () => modal.classList.add('open');
+    const closeModal = () => modal.classList.remove('open');
+
+    this.openShortcutsModal = openModal;
+    this.closeShortcutsModal = closeModal;
+
+    if (triggerBtn) triggerBtn.onclick = openModal;
+    if (closeBtn) closeBtn.onclick = closeModal;
+
+    modal.onclick = (e) => {
+      if (e.target === modal) closeModal();
+    };
+  },
+
+  // -------------------------------------------------------------
+  // First-Time Onboarding Spotlight Tour
+  // -------------------------------------------------------------
+  tourStep: 0,
+  tourSteps: [
+    {
+      targetSelector: '.search-input-container',
+      title: 'Instant Multi-Code Search',
+      text: 'Type IPC section numbers (e.g., 302, 420), BNS section numbers (103, 316), or keywords to look up statutory comparisons immediately.'
+    },
+    {
+      targetSelector: '.direction-toggle',
+      title: 'Bidirectional Mapping',
+      text: 'Toggle between Old (IPC) → New (BNS) and New (BNS) → Old (IPC) to inspect numbering conversions both ways.'
+    },
+    {
+      targetSelector: '.header-nav',
+      title: 'Interactive Learning & Tools',
+      text: 'Access scenario quizzes with practical judicial problems, spaced-repetition flashcards, and side-by-side comparison mode.'
+    }
+  ],
+
+  startTour(force = false) {
+    if (!force && storage.getTourCompleted()) return;
+    const overlay = document.getElementById('tour-overlay');
+    if (!overlay) return;
+
+    this.tourStep = 0;
+    overlay.classList.add('open');
+    this.renderTourStep();
+
+    const skipBtn = document.getElementById('tour-skip-btn');
+    const nextBtn = document.getElementById('tour-next-btn');
+
+    if (skipBtn) {
+      skipBtn.onclick = () => {
+        overlay.classList.remove('open');
+        storage.setTourCompleted(true);
+      };
+    }
+
+    if (nextBtn) {
+      nextBtn.onclick = () => {
+        this.tourStep++;
+        if (this.tourStep >= this.tourSteps.length) {
+          overlay.classList.remove('open');
+          storage.setTourCompleted(true);
+          this.showToast('Tour completed! Press ? anytime for shortcuts.', 'success');
+        } else {
+          this.renderTourStep();
+        }
+      };
+    }
+  },
+
+  renderTourStep() {
+    const step = this.tourSteps[this.tourStep];
+    const spotlight = document.getElementById('tour-spotlight-box');
+    const card = document.getElementById('tour-card');
+    const titleEl = document.getElementById('tour-title');
+    const textEl = document.getElementById('tour-text');
+    const indicator = document.getElementById('tour-step-indicator');
+    const nextBtn = document.getElementById('tour-next-btn');
+
+    if (!step || !spotlight || !card) return;
+
+    titleEl.textContent = step.title;
+    textEl.textContent = step.text;
+    indicator.textContent = `Step ${this.tourStep + 1} of ${this.tourSteps.length}`;
+    if (nextBtn) {
+      nextBtn.textContent = this.tourStep === this.tourSteps.length - 1 ? 'Finish' : 'Next →';
+    }
+
+    const target = document.querySelector(step.targetSelector);
+    if (target) {
+      const rect = target.getBoundingClientRect();
+      const pad = 6;
+      spotlight.style.top = `${rect.top + window.scrollY - pad}px`;
+      spotlight.style.left = `${rect.left + window.scrollX - pad}px`;
+      spotlight.style.width = `${rect.width + pad * 2}px`;
+      spotlight.style.height = `${rect.height + pad * 2}px`;
+
+      // Position card below or above target
+      const cardTop = rect.bottom + window.scrollY + 14;
+      card.style.top = `${cardTop}px`;
+      card.style.left = `${Math.max(16, Math.min(window.innerWidth - 340, rect.left + window.scrollX))}px`;
+    } else {
+      // Fallback center position
+      spotlight.style.top = '20%';
+      spotlight.style.left = '50%';
+      spotlight.style.width = '0px';
+      spotlight.style.height = '0px';
+      card.style.top = '30%';
+      card.style.left = '50%';
+      card.style.transform = 'translateX(-50%)';
+    }
+  },
+
+  // -------------------------------------------------------------
+  // Mobile Bottom Nav Indicator
+  // -------------------------------------------------------------
+  updateBottomNavGlider() {
+    const activeItem = document.querySelector('.bottom-nav-item.active');
+    const indicator = document.getElementById('bottom-nav-indicator');
+    if (!activeItem || !indicator) return;
+    const rect = activeItem.getBoundingClientRect();
+    const parentRect = activeItem.parentElement.getBoundingClientRect();
+    indicator.style.left = `${rect.left - parentRect.left}px`;
+    indicator.style.width = `${rect.width}px`;
   }
 };

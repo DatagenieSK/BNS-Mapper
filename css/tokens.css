@@ -1,0 +1,209 @@
+/* ==========================================================================
+   BNS Mapper - Design Tokens (tokens.css)
+   Colors, Elevation, Spacing, Typography, and Motion Language
+   ========================================================================== */
+
+:root {
+  /* Warm Editorial Paper Light Theme (Default) */
+  --bg-primary: #FDFBF7;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #FFFFFF;
+  --bg-subtle: #F6F1EB;
+  --bg-muted: #EFE8DF;
+  --bg-canvas: #FAF6F0;
+  
+  --border-light: #F0E8DF;
+  --border-color: #E2D7CC;
+  --border-strong: #C4B5A5;
+  
+  --text-primary: #1F1B16;
+  --text-secondary: #584F45;
+  --text-muted: #7E756A;
+  --text-on-accent: #FFFFFF;
+  
+  --accent: #883B1B;             /* Terracotta law leather */
+  --accent-hover: #6D2C10;
+  --accent-active: #54220A;
+  --accent-subtle: #FBF0EA;
+  --accent-border: #E8BFAC;
+  --accent-glow: rgba(136, 59, 27, 0.22);
+
+  /* Status & Severity Colors */
+  --color-success: #19682C;
+  --color-success-bg: #EDF7EE;
+  --color-success-border: #BEE3C4;
+  --color-warning: #8C5303;
+  --color-warning-bg: #FEF6E8;
+  --color-warning-border: #F8DFB4;
+  --color-danger: #8E2323;
+  --color-danger-bg: #FDF0F0;
+  --color-danger-border: #F7C8C8;
+  --color-info: #2C4B75;
+  --color-info-bg: #EEF2F6;
+  --color-info-border: #CBD8E8;
+  
+  /* Change Type Badges */
+  --badge-renumbered-bg: #EEF2F6;
+  --badge-renumbered-text: #2C4B75;
+  --badge-renumbered-border: #CBD8E8;
+  
+  --badge-modified-bg: #FEF6E8;
+  --badge-modified-text: #8C5303;
+  --badge-modified-border: #F8DFB4;
+  
+  --badge-merged-bg: #F4EFFB;
+  --badge-merged-text: #5E328A;
+  --badge-merged-border: #DECFF2;
+  
+  --badge-split-bg: #E8F7F7;
+  --badge-split-text: #0E6566;
+  --badge-split-border: #B7E8E9;
+  
+  --badge-new-bg: #EDF7EE;
+  --badge-new-text: #19682C;
+  --badge-new-border: #BEE3C4;
+  
+  --badge-omitted-bg: #FDF0F0;
+  --badge-omitted-text: #8E2323;
+  --badge-omitted-border: #F7C8C8;
+
+  --banner-bg: #FFF7ED;
+  --banner-text: #8A4011;
+  --banner-border: #FFEDD5;
+
+  /* Elevation Shadows */
+  --shadow-sm: 0 1px 3px rgba(45, 35, 25, 0.06);
+  --shadow-md: 0 4px 14px rgba(45, 35, 25, 0.08);
+  --shadow-lg: 0 12px 30px rgba(45, 35, 25, 0.12);
+  --shadow-xl: 0 20px 48px rgba(45, 35, 25, 0.16);
+  --shadow-inner: inset 0 2px 4px rgba(45, 35, 25, 0.05);
+
+  /* Geometry & Border Radius */
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-pill: 9999px;
+
+  /* Typography Scale */
+  --font-serif: "Charter", "Bitstream Charter", "Sitka Text", Cambria, Georgia, "Times New Roman", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* Spacing Scale (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Motion Language */
+  --motion-fast: 140ms;
+  --motion-base: 240ms;
+  --motion-slow: 380ms;
+  --motion-deliberate: 520ms;
+
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.15);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Z-Index Hierarchy */
+  --z-base: 1;
+  --z-sticky: 100;
+  --z-header: 400;
+  --z-bottom-nav: 450;
+  --z-tour-highlight: 600;
+  --z-tour: 700;
+  --z-modal-backdrop: 800;
+  --z-modal: 850;
+  --z-palette: 900;
+  --z-toast: 1000;
+  --z-splash: 1200;
+
+  /* Paper Grain Texture overlay */
+  --paper-grain: radial-gradient(rgba(45, 35, 25, 0.02) 1px, transparent 0);
+}
+
+/* Explicit High-Contrast Dark Theme */
+html[data-theme="dark"] {
+  --bg-primary: #111418;
+  --bg-surface: #181D24;
+  --bg-surface-elevated: #212732;
+  --bg-subtle: #242B37;
+  --bg-muted: #2E3746;
+  --bg-canvas: #15191F;
+  
+  --border-light: #252D3A;
+  --border-color: #333E50;
+  --border-strong: #4B5A74;
+  
+  --text-primary: #F2EFEA;
+  --text-secondary: #BCB6AC;
+  --text-muted: #858076;
+  --text-on-accent: #111418;
+  
+  --accent: #E58650;
+  --accent-hover: #F29966;
+  --accent-active: #FFAF80;
+  --accent-subtle: #2B1E16;
+  --accent-border: #6B3D23;
+  --accent-glow: rgba(229, 134, 80, 0.25);
+
+  --color-success: #60D67B;
+  --color-success-bg: #14301B;
+  --color-success-border: #24562F;
+  --color-warning: #F5BE6B;
+  --color-warning-bg: #352613;
+  --color-warning-border: #5C411E;
+  --color-danger: #F48787;
+  --color-danger-bg: #341818;
+  --color-danger-border: #5E2626;
+  --color-info: #8EB4E8;
+  --color-info-bg: #1B293E;
+  --color-info-border: #2D4263;
+  
+  --badge-renumbered-bg: #1B293E;
+  --badge-renumbered-text: #96BDED;
+  --badge-renumbered-border: #2D4263;
+  
+  --badge-modified-bg: #352613;
+  --badge-modified-text: #F3BC66;
+  --badge-modified-border: #5C411E;
+  
+  --badge-merged-bg: #2C1E3C;
+  --badge-merged-text: #CAA7F5;
+  --badge-merged-border: #4D336B;
+  
+  --badge-split-bg: #142F32;
+  --badge-split-text: #66DFE1;
+  --badge-split-border: #225156;
+  
+  --badge-new-bg: #14301B;
+  --badge-new-text: #7FE095;
+  --badge-new-border: #24562F;
+  
+  --badge-omitted-bg: #341818;
+  --badge-omitted-text: #F28C8C;
+  --badge-omitted-border: #5E2626;
+
+  --banner-bg: #2B1D12;
+  --banner-text: #F3B077;
+  --banner-border: #4A301D;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.7);
+  --shadow-xl: 0 20px 48px rgba(0, 0, 0, 0.8);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.35);
+
+  --paper-grain: none;
+}
