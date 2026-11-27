@@ -1,6 +1,7 @@
 /**
- * UI Renderer for BNS Mapper (Extended Round 2)
- * Editorial Law Layout, Animated Number Morph, Quiz, Leitner Flashcards, Compare Mode & What's New
+ * UI Renderer for BNS Mapper (Round 1 Upgrade)
+ * Supports multi-section array mappings (e.g., "IPC 300 + 302 -> BNS 103"),
+ * chapters index metadata, quiz, Leitner flashcards, compare mode & What's New.
  */
 
 import { storage, DIRECTIONS, STATUTES } from './storage.js';
@@ -12,9 +13,58 @@ export const ui = {
   activeFilterChange: 'all',
   lastSearchQuery: '',
   morphTimer: null,
+  chaptersIndex: [],
 
   init(containerEl) {
     this.appContainer = containerEl;
+  },
+
+  setChaptersIndex(index) {
+    this.chaptersIndex = index || [];
+  },
+
+  getChapterTitle(chNum) {
+    const found = this.chaptersIndex.find(c => c.chapter === chNum);
+    return found ? `${found.title} (Sections ${found.range})` : `Chapter ${chNum}`;
+  },
+
+  // -------------------------------------------------------------
+  // Helpers
+  // -------------------------------------------------------------
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  },
+
+  getBadgeHtml(changeType) {
+    const type = (changeType || 'renumbered').toLowerCase();
+    return `<span class="badge badge-${type}">${this.escapeHtml(type)}</span>`;
+  },
+
+  highlightSearchTerm(text, term) {
+    if (!text || !term) return this.escapeHtml(text);
+    const escapedText = this.escapeHtml(text);
+    const cleanTerm = term.trim().replace(/[^a-zA-Z0-9]/g, '');
+    if (!cleanTerm) return escapedText;
+
+    const regex = new RegExp(`(${cleanTerm})`, 'gi');
+    return escapedText.replace(regex, '<mark class="search-highlight">$1</mark>');
+  },
+
+  // Multi-Section Format Helper (e.g. IPC 300 + 302 -> BNS 103)
+  formatSections(arr, prefix = '') {
+    if (!arr) return 'None';
+    const list = Array.isArray(arr) ? arr : [arr];
+    if (list.length === 0 || (list.length === 1 && list[0] === 'None')) return `None (New)`;
+    if (list.length === 1 && list[0] === 'Omitted') return `Omitted`;
+
+    const joined = list.map(num => `§ ${num}`).join(' + ');
+    return prefix ? `${prefix} ${joined}` : joined;
   },
 
   // -------------------------------------------------------------
@@ -49,31 +99,6 @@ export const ui = {
     }, duration);
   },
 
-  escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  },
-
-  getBadgeHtml(changeType) {
-    const type = (changeType || 'renumbered').toLowerCase();
-    return `<span class="badge badge-${type}">${this.escapeHtml(type)}</span>`;
-  },
-
-  highlightSearchTerm(text, term) {
-    if (!text || !term) return this.escapeHtml(text);
-    const escapedText = this.escapeHtml(text);
-    const cleanTerm = term.trim().replace(/[^a-zA-Z0-9]/g, '');
-    if (!cleanTerm) return escapedText;
-
-    const regex = new RegExp(`(${cleanTerm})`, 'gi');
-    return escapedText.replace(regex, '<mark class="search-highlight">$1</mark>');
-  },
-
   // -------------------------------------------------------------
   // Compare Tray Floating Helper
   // -------------------------------------------------------------
@@ -98,7 +123,7 @@ export const ui = {
         PINNED (${compareList.length}/3):
       </span>
       <div class="compare-tray-chips">
-        ${compareList.map(id => `<span class="compare-chip">${this.escapeHtml(id.replace('ipc-', '§').replace('crpc-', '§').replace('iea-', '§'))}</span>`).join('')}
+        ${compareList.map(id => `<span class="compare-chip">${this.escapeHtml(id.replace('ipc-', '§').replace('bns-', '§'))}</span>`).join('')}
       </div>
       <a href="#/compare" class="btn btn-primary" style="padding: 4px 12px; font-size: 0.775rem;">
         Compare Now &rarr;
@@ -136,10 +161,10 @@ export const ui = {
     allSections.forEach(s => { if (counts[s.change] !== undefined) counts[s.change]++; });
 
     let statutePairName = 'IPC (1860) &harr; BNS (2023)';
-    let primaryPlaceholder = isIpcToBns ? 'IPC number (e.g. 302, 420)' : 'BNS number (e.g. 103, 318)';
+    let primaryPlaceholder = isIpcToBns ? 'IPC number (e.g. 34, 76, 302)' : 'BNS number (e.g. 1, 4, 14, 103)';
     if (currentStatute === STATUTES.CRPC_BNSS) {
       statutePairName = 'CrPC (1973) &harr; BNSS (2023)';
-      primaryPlaceholder = isIpcToBns ? 'CrPC section (e.g. 41, 154, 167)' : 'BNSS section (e.g. 35, 173, 187)';
+      primaryPlaceholder = isIpcToBns ? 'CrPC section (e.g. 41, 154)' : 'BNSS section (e.g. 35, 173)';
     } else if (currentStatute === STATUTES.IEA_BSA) {
       statutePairName = 'IEA (1872) &harr; BSA (2023)';
       primaryPlaceholder = isIpcToBns ? 'IEA section (e.g. 27, 65B)' : 'BSA section (e.g. 23, 63)';
@@ -147,18 +172,17 @@ export const ui = {
 
     this.appContainer.innerHTML = `
       <section class="search-hero" aria-labelledby="hero-title">
-        <!-- Hero Number Morph -->
         <div class="hero-morph-banner" aria-hidden="true">
           <span>Old Code:</span>
-          <span id="hero-morph-old" class="morph-pill">IPC 302</span>
+          <span id="hero-morph-old" class="morph-pill">IPC 1 to 5</span>
           <span>&rarr;</span>
           <span>New Sanhita:</span>
-          <span id="hero-morph-new" class="morph-pill">BNS 103</span>
+          <span id="hero-morph-new" class="morph-pill">BNS 1</span>
         </div>
 
         <h2 id="hero-title" class="hero-title">Navigate Indian Criminal Law</h2>
         <p class="hero-subtitle">
-          Instant cross-reference for <strong>${statutePairName}</strong> with full statutory text and plain-English analysis.
+          Instant multi-section cross-reference for <strong>${statutePairName}</strong> with full operative extracts and plain-English analysis.
         </p>
 
         <div class="search-box-wrapper">
@@ -171,7 +195,7 @@ export const ui = {
               type="search"
               id="search-input"
               class="search-input"
-              placeholder="Search by ${primaryPlaceholder}, title, or tag..."
+              placeholder="Search by ${primaryPlaceholder}, title, or keyword..."
               value="${this.escapeHtml(query)}"
               autocomplete="off"
               spellcheck="false"
@@ -191,9 +215,8 @@ export const ui = {
             <span class="search-kbd-hint" title="Press / to focus">/</kbd></span>
           </div>
 
-          <!-- Filter Pills -->
           <div class="filter-pills-row" role="radiogroup" aria-label="Filter by change type">
-            ${['all', 'renumbered', 'modified', 'new', 'split', 'omitted'].map(type => `
+            ${['all', 'renumbered', 'modified', 'merged', 'split', 'new', 'omitted'].map(type => `
               <button
                 class="filter-pill ${filterChange === type ? 'active' : ''}"
                 data-filter="${type}"
@@ -211,7 +234,7 @@ export const ui = {
       <section class="results-section" aria-live="polite">
         <div class="results-meta-bar">
           <span class="results-count">
-            Showing <strong>${results.length}</strong> ${results.length === 1 ? 'section' : 'sections'}
+            Showing <strong>${results.length}</strong> ${results.length === 1 ? 'provision' : 'provisions'}
             ${filterChange !== 'all' ? `marked <em>${filterChange}</em>` : ''}
           </span>
           <div style="display: flex; gap: 12px; font-size: 0.85rem;">
@@ -228,7 +251,7 @@ export const ui = {
               <line x1="8" y1="11" x2="14" y2="11"></line>
             </svg>
             <h3>No matching sections found</h3>
-            <p>Try searching with a section number like <strong>302</strong>, <strong>420</strong>, <strong>41</strong>, or keywords like <strong>theft</strong>, <strong>mob lynching</strong>, <strong>e-fir</strong>.</p>
+            <p>Try searching with a section number like <strong>4</strong>, <strong>14</strong>, <strong>34</strong>, <strong>302</strong>, or keywords like <strong>common intention</strong>, <strong>private defence</strong>, <strong>mistake of fact</strong>.</p>
           </div>
         ` : `
           <div class="sections-grid">
@@ -246,12 +269,12 @@ export const ui = {
   startHeroMorph() {
     clearInterval(this.morphTimer);
     const morphs = [
-      { oldCode: 'IPC 302', newCode: 'BNS 103(1)' },
-      { oldCode: 'IPC 420', newCode: 'BNS 318(4)' },
-      { oldCode: 'IPC 124A', newCode: 'BNS 152' },
-      { oldCode: 'IPC 379', newCode: 'BNS 303(2)' },
-      { oldCode: 'IPC 304B', newCode: 'BNS 80' },
-      { oldCode: 'IPC 498A', newCode: 'BNS 85 & 86' }
+      { oldCode: 'IPC 1 to 5', newCode: 'BNS 1' },
+      { oldCode: 'IPC 34', newCode: 'BNS 3(5)' },
+      { oldCode: 'IPC 53', newCode: 'BNS 4' },
+      { oldCode: 'IPC 76', newCode: 'BNS 14' },
+      { oldCode: 'IPC 84', newCode: 'BNS 22' },
+      { oldCode: 'IPC 96', newCode: 'BNS 34' }
     ];
     let idx = 0;
     const oldEl = document.getElementById('hero-morph-old');
@@ -284,16 +307,18 @@ export const ui = {
     if (statute === STATUTES.CRPC_BNSS) { oldPrefix = 'CrPC'; newPrefix = 'BNSS'; }
     else if (statute === STATUTES.IEA_BSA) { oldPrefix = 'IEA'; newPrefix = 'BSA'; }
 
-    const primaryNumber = isIpcToBns
-      ? (item.ipc === 'None' ? `New in ${newPrefix}` : `${oldPrefix} § ${item.ipc}`)
-      : (item.bns === 'Omitted' ? `Omitted in ${newPrefix}` : `${newPrefix} § ${item.bns}`);
+    // Multi-section formatted labels
+    const formattedIpc = this.formatSections(item.ipc, oldPrefix);
+    const formattedBns = this.formatSections(item.bns, newPrefix);
 
-    const secondaryNumber = isIpcToBns
-      ? (item.bns === 'Omitted' ? 'Omitted' : `${newPrefix} § ${item.bns}`)
-      : (item.ipc === 'None' ? 'New Provision' : `${oldPrefix} § ${item.ipc}`);
+    const primaryNumber = isIpcToBns ? formattedIpc : formattedBns;
+    const secondaryNumber = isIpcToBns ? formattedBns : formattedIpc;
 
     const highlightedTitle = this.highlightSearchTerm(item.title, query);
     const highlightedExplanation = this.highlightSearchTerm(item.explanation, query);
+
+    // Format chapter display
+    const chLabel = item.chapter ? `Chapter ${item.chapter}` : '';
 
     return `
       <article class="section-card" data-section-id="${item.id}">
@@ -338,7 +363,7 @@ export const ui = {
         <p class="card-explanation">${highlightedExplanation}</p>
 
         <div class="card-footer">
-          <span class="card-chapter-tag" title="${this.escapeHtml(item.chapter)}">${this.escapeHtml(item.chapter)}</span>
+          <span class="card-chapter-tag" title="${chLabel}">${chLabel}</span>
           <a href="#/section/${item.id}" class="card-read-more" aria-label="Compare Section ${item.id}">
             Compare &rarr;
           </a>
@@ -403,7 +428,7 @@ export const ui = {
     if (metaBar) {
       metaBar.innerHTML = `
         <span class="results-count">
-          Showing <strong>${results.length}</strong> ${results.length === 1 ? 'section' : 'sections'}
+          Showing <strong>${results.length}</strong> ${results.length === 1 ? 'provision' : 'provisions'}
           ${this.activeFilterChange !== 'all' ? `marked <em>${this.activeFilterChange}</em>` : ''}
         </span>
         <div style="display: flex; gap: 12px; font-size: 0.85rem;">
@@ -446,7 +471,6 @@ export const ui = {
   },
 
   bindCardActions() {
-    // Bookmarks
     document.querySelectorAll('.bookmark-btn').forEach(btn => {
       btn.onclick = (e) => {
         e.preventDefault();
@@ -460,7 +484,6 @@ export const ui = {
       };
     });
 
-    // Pin to Compare
     document.querySelectorAll('[data-pin-id]').forEach(btn => {
       btn.onclick = (e) => {
         e.preventDefault();
@@ -481,7 +504,7 @@ export const ui = {
   },
 
   // -------------------------------------------------------------
-  // View 2: Section Detail Page
+  // View 2: Section Detail Page (Multi-Section Support)
   // -------------------------------------------------------------
   renderSectionDetail(idOrNumber) {
     const item = searchEngine.getSectionById(idOrNumber);
@@ -498,7 +521,10 @@ export const ui = {
       return;
     }
 
-    document.title = `IPC ${item.ipc} → BNS ${item.bns}: ${item.title} — BNS Mapper`;
+    const bnsLabel = this.formatSections(item.bns);
+    const ipcLabel = this.formatSections(item.ipc);
+
+    document.title = `IPC ${ipcLabel} → BNS ${bnsLabel}: ${item.title} — BNS Mapper`;
     const isBookmarked = storage.isBookmarked(item.id);
     const isPinned = storage.isComparing(item.id);
 
@@ -506,6 +532,8 @@ export const ui = {
     const curIndex = all.findIndex(s => s.id === item.id);
     const prevItem = curIndex > 0 ? all[curIndex - 1] : null;
     const nextItem = curIndex < all.length - 1 ? all[curIndex + 1] : null;
+
+    const chFullTitle = this.getChapterTitle(item.chapter);
 
     this.appContainer.innerHTML = `
       <article class="detail-view" aria-labelledby="detail-title">
@@ -541,7 +569,7 @@ export const ui = {
         </nav>
 
         <header class="detail-header-card">
-          <div class="detail-chapter">${this.escapeHtml(item.chapter)}</div>
+          <div class="detail-chapter">Chapter ${this.escapeHtml(item.chapter)} &bull; ${this.escapeHtml(chFullTitle)}</div>
           <div class="detail-badges">
             ${this.getBadgeHtml(item.change)}
             ${item.verified ? `
@@ -567,13 +595,13 @@ export const ui = {
 
           <div class="mapping-banner-box">
             <div>
-              <div class="map-col-title">Old Law Provision</div>
-              <div class="map-col-sec">${item.ipc === 'None' ? 'None (New)' : `Section ${this.escapeHtml(item.ipc)}`}</div>
+              <div class="map-col-title">Old Indian Penal Code (1860)</div>
+              <div class="map-col-sec">${this.formatSections(item.ipc)}</div>
             </div>
             <div class="map-arrow-icon">&rarr;</div>
             <div>
-              <div class="map-col-title">New Sanhita Provision</div>
-              <div class="map-col-sec">${item.bns === 'Omitted' ? 'Omitted' : `Section ${this.escapeHtml(item.bns)}`}</div>
+              <div class="map-col-title">Bharatiya Nyaya Sanhita (2023)</div>
+              <div class="map-col-sec">${this.formatSections(item.bns)}</div>
             </div>
           </div>
         </header>
@@ -583,7 +611,7 @@ export const ui = {
           <div class="comparison-container">
             <div class="comparison-box">
               <div class="comparison-header">
-                <span>Old Law extract &bull; § ${this.escapeHtml(item.ipc)}</span>
+                <span>IPC 1860 &bull; ${this.formatSections(item.ipc)}</span>
                 <span class="badge" style="font-size: 0.65rem;">Repealed</span>
               </div>
               <div class="comparison-body">
@@ -593,7 +621,7 @@ export const ui = {
 
             <div class="comparison-box">
               <div class="comparison-header">
-                <span>New Sanhita extract &bull; § ${this.escapeHtml(item.bns)}</span>
+                <span>BNS 2023 &bull; ${this.formatSections(item.bns)}</span>
                 <span class="badge badge-new" style="font-size: 0.65rem;">In Force</span>
               </div>
               <div class="comparison-body">
@@ -640,19 +668,18 @@ export const ui = {
         <nav style="display: flex; justify-content: space-between; gap: 16px; margin-top: 32px;" aria-label="Adjacent provisions">
           ${prevItem ? `
             <a href="#/section/${prevItem.id}" class="btn btn-outline">
-              &larr; Prev (§ ${prevItem.ipc})
+              &larr; Prev: ${this.formatSections(prevItem.bns)}
             </a>
           ` : '<div></div>'}
           ${nextItem ? `
             <a href="#/section/${nextItem.id}" class="btn btn-outline">
-              Next (§ ${nextItem.ipc}) &rarr;
+              Next: ${this.formatSections(nextItem.bns)} &rarr;
             </a>
           ` : '<div></div>'}
         </nav>
       </article>
     `;
 
-    // Bind Detail actions
     const shareBtn = document.getElementById('detail-share-btn');
     if (shareBtn) {
       shareBtn.onclick = () => {
@@ -701,7 +728,7 @@ export const ui = {
   },
 
   // -------------------------------------------------------------
-  // View 3: Chapter Browser
+  // View 3: Chapter Browser (Chapters Index Grouping)
   // -------------------------------------------------------------
   renderChaptersView({ filterChange = 'all' } = {}) {
     document.title = 'Chapters & Categories — BNS Mapper';
@@ -712,7 +739,7 @@ export const ui = {
 
     const chaptersMap = new Map();
     filtered.forEach(item => {
-      const ch = item.chapter || 'Other Provisions';
+      const ch = item.chapter || 'I';
       if (!chaptersMap.has(ch)) chaptersMap.set(ch, []);
       chaptersMap.get(ch).push(item);
     });
@@ -724,11 +751,11 @@ export const ui = {
       <section class="chapters-view-container" aria-labelledby="chapters-title">
         <div style="margin-bottom: 20px;">
           <h2 id="chapters-title" style="font-size: 2rem; margin-bottom: 8px;">Chapter Browser</h2>
-          <p>Explore provisions organized by legal subject areas and statutory chapters.</p>
+          <p>Explore provisions organized by BNS chapters (Chapters I to XX) with multi-section mappings.</p>
         </div>
 
         <div class="filter-pills-row" style="justify-content: flex-start; margin-bottom: 24px;" role="radiogroup" aria-label="Filter chapters by change type">
-          ${['all', 'renumbered', 'modified', 'new', 'split', 'omitted'].map(type => `
+          ${['all', 'renumbered', 'modified', 'merged', 'split', 'new', 'omitted'].map(type => `
             <button class="filter-pill ${filterChange === type ? 'active' : ''}" data-chapter-filter="${type}" role="radio" aria-checked="${filterChange === type}">
               ${type.charAt(0).toUpperCase() + type.slice(1)}
             </button>
@@ -736,27 +763,32 @@ export const ui = {
         </div>
 
         <div class="chapters-container">
-          ${Array.from(chaptersMap.entries()).map(([chapterName, items]) => `
-            <div class="chapter-group">
-              <div class="chapter-header">
-                <h3 class="chapter-title">${this.escapeHtml(chapterName)}</h3>
-                <span class="chapter-count-badge">${items.length} ${items.length === 1 ? 'section' : 'sections'}</span>
+          ${Array.from(chaptersMap.entries()).map(([chKey, items]) => {
+            const chTitle = this.getChapterTitle(chKey);
+            return `
+              <div class="chapter-group">
+                <div class="chapter-header">
+                  <h3 class="chapter-title">Chapter ${this.escapeHtml(chKey)}: ${this.escapeHtml(chTitle)}</h3>
+                  <span class="chapter-count-badge">${items.length} ${items.length === 1 ? 'section' : 'sections'}</span>
+                </div>
+                <div class="chapter-sections-list">
+                  ${items.map(item => `
+                    <a href="#/section/${item.id}" class="chapter-section-item">
+                      <div class="sec-info-left">
+                        <span class="sec-pill-num">
+                          ${isIpcToBns
+                            ? `${this.formatSections(item.ipc, 'IPC')} &rarr; ${this.formatSections(item.bns, 'BNS')}`
+                            : `${this.formatSections(item.bns, 'BNS')} &rarr; ${this.formatSections(item.ipc, 'IPC')}`}
+                        </span>
+                        <span class="sec-title-text">${this.escapeHtml(item.title)}</span>
+                      </div>
+                      <div>${this.getBadgeHtml(item.change)}</div>
+                    </a>
+                  `).join('')}
+                </div>
               </div>
-              <div class="chapter-sections-list">
-                ${items.map(item => `
-                  <a href="#/section/${item.id}" class="chapter-section-item">
-                    <div class="sec-info-left">
-                      <span class="sec-pill-num">
-                        ${isIpcToBns ? `§ ${item.ipc} &rarr; § ${item.bns}` : `§ ${item.bns} &rarr; § ${item.ipc}`}
-                      </span>
-                      <span class="sec-title-text">${this.escapeHtml(item.title)}</span>
-                    </div>
-                    <div>${this.getBadgeHtml(item.change)}</div>
-                  </a>
-                `).join('')}
-              </div>
-            </div>
-          `).join('')}
+            `;
+          }).join('')}
         </div>
       </section>
     `;
@@ -837,8 +869,8 @@ export const ui = {
               <tbody>
                 ${savedSections.map(item => `
                   <tr>
-                    <td><strong>§ ${item.ipc}</strong></td>
-                    <td><strong style="color: var(--accent);">§ ${item.bns}</strong></td>
+                    <td><strong>${this.formatSections(item.ipc)}</strong></td>
+                    <td><strong style="color: var(--accent);">${this.formatSections(item.bns)}</strong></td>
                     <td><a href="#/section/${item.id}"><strong>${this.escapeHtml(item.title)}</strong></a></td>
                     <td>${this.getBadgeHtml(item.change)}</td>
                     <td style="font-size: 0.825rem;">${this.escapeHtml(item.punishment_new)}</td>
@@ -901,7 +933,6 @@ export const ui = {
           </div>
         </div>
 
-        <!-- Quiz Setup Card -->
         <div class="detail-header-card" style="margin-bottom: 24px; padding: 20px;">
           <div style="display: grid; grid-template-columns: 1fr; gap: 16px;">
             <div>
@@ -919,7 +950,7 @@ export const ui = {
                   <div class="section-label">Chapter Filter</div>
                   <select id="quiz-chapter-select" style="padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color); background: var(--bg-surface); color: var(--text-primary); font-size: 0.9rem;">
                     <option value="all">All Chapters</option>
-                    ${allChapters.map(ch => `<option value="${this.escapeHtml(ch)}" ${chapter === ch ? 'selected' : ''}>${this.escapeHtml(ch)}</option>`).join('')}
+                    ${allChapters.map(ch => `<option value="${this.escapeHtml(ch)}" ${chapter === ch ? 'selected' : ''}>Chapter ${this.escapeHtml(ch)}</option>`).join('')}
                   </select>
                 </div>
                 <div>
@@ -943,10 +974,8 @@ export const ui = {
           </div>
         </div>
 
-        <!-- Active Quiz Play Area -->
         <div id="quiz-play-area"></div>
 
-        <!-- Progress Dashboard -->
         <section style="margin-top: 40px;" aria-labelledby="dashboard-title">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
             <h3 id="dashboard-title" style="font-size: 1.5rem;">Study Performance Dashboard</h3>
@@ -972,34 +1001,14 @@ export const ui = {
             </div>
           </div>
 
-          <!-- Score History Chart (Inline SVG) -->
           <div class="chart-container">
             <div class="section-label" style="margin-bottom: 8px;">Recent Session Accuracy (%)</div>
             ${this.renderHistorySvgChart(stats.history)}
-          </div>
-
-          <!-- Badges Collection -->
-          <div style="margin-top: 24px;">
-            <div class="section-label">Earned Achievement Badges</div>
-            <div class="badges-grid">
-              ${(stats.badges || []).length === 0 ? `
-                <p style="font-size: 0.85rem; color: var(--text-muted);">Complete quiz sessions to unlock achievement badges.</p>
-              ` : (stats.badges || []).map(b => `
-                <div class="badge-item-card">
-                  <div class="badge-icon-gold">🏆</div>
-                  <div>
-                    <strong style="font-size: 0.9rem; display: block;">${this.escapeHtml(b.name)}</strong>
-                    <span style="font-size: 0.75rem; color: var(--text-muted);">${this.escapeHtml(b.desc)}</span>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
           </div>
         </section>
       </section>
     `;
 
-    // Bind Setup Events
     document.querySelectorAll('[data-quiz-mode]').forEach(btn => {
       btn.onclick = () => {
         const m = btn.getAttribute('data-quiz-mode');
@@ -1122,7 +1131,7 @@ export const ui = {
         </div>
 
         <div class="question-type-label">
-          ${q.type === 'scenario' ? `Case Scenario: ${this.escapeHtml(q.title)}` : (q.type === 'true_false' ? 'True or False' : 'Section Mapping')}
+          ${q.type === 'scenario' ? `Case Scenario: ${this.escapeHtml(q.title || 'Practical Legal Application')}` : (q.type === 'true_false' ? 'True or False' : 'Section Mapping')}
         </div>
 
         <h3 class="question-prompt">${this.escapeHtml(q.prompt)}</h3>
@@ -1152,7 +1161,6 @@ export const ui = {
     const isCorrect = selectedIdx === question.correctIndex;
     if (isCorrect) session.score++;
 
-    // Disable all options
     document.querySelectorAll('.quiz-option-btn').forEach((b, i) => {
       b.disabled = true;
       if (i === question.correctIndex) {
@@ -1203,8 +1211,7 @@ export const ui = {
     const score = session.score;
     const pct = Math.round((score / total) * 100);
 
-    // Save to storage
-    const updatedStats = storage.recordQuizSession({
+    storage.recordQuizSession({
       score,
       total,
       mode: session.mode,
@@ -1239,9 +1246,6 @@ export const ui = {
     }
   },
 
-  // -------------------------------------------------------------
-  // Match-the-Pairs Game
-  // -------------------------------------------------------------
   startMatchGame() {
     const playArea = document.getElementById('quiz-play-area');
     if (!playArea) return;
@@ -1303,7 +1307,6 @@ export const ui = {
 
         if (selectedLeft && selectedRight) {
           if (selectedLeft === selectedRight) {
-            // Match found!
             document.querySelectorAll(`[data-pair-id="${selectedLeft}"]`).forEach(t => {
               t.classList.remove('selected');
               t.classList.add('matched');
@@ -1352,7 +1355,6 @@ export const ui = {
           <p>Click card to flip between Old Law and New Sanhita. Cards advance to Box 5 as you master them.</p>
         </div>
 
-        <!-- 5 Leitner Box Counters -->
         <div class="leitner-boxes-bar">
           ${[1, 2, 3, 4, 5].map(b => `
             <div class="leitner-box-col">
@@ -1368,32 +1370,29 @@ export const ui = {
             <p>You have mastered your current pool of cards.</p>
           </div>
         ` : `
-          <!-- 3D Flip Flashcard -->
           <div class="flashcard-wrapper">
             <div id="active-flashcard" class="flashcard" role="button" aria-label="Flashcard: click to flip" tabindex="0">
-              <!-- Front Face (Prompt) -->
               <div class="card-face front">
                 <div>
                   <span class="badge badge-renumbered" style="margin-bottom: 12px;">Front: Old Law</span>
-                  <div style="font-size: 0.85rem; color: var(--text-muted);">${this.escapeHtml(card.chapter)}</div>
+                  <div style="font-size: 0.85rem; color: var(--text-muted);">${card.chapter ? `Chapter ${card.chapter}` : ''}</div>
                 </div>
                 <div style="text-align: center; margin: 32px 0;">
-                  <div style="font-family: var(--font-mono); font-size: 2.2rem; font-weight: 700; color: var(--accent); margin-bottom: 8px;">
-                    § ${this.escapeHtml(card.ipc)}
+                  <div style="font-family: var(--font-mono); font-size: 2rem; font-weight: 700; color: var(--accent); margin-bottom: 8px;">
+                    ${this.formatSections(card.ipc, 'IPC')}
                   </div>
-                  <h3 style="font-size: 1.3rem;">${this.escapeHtml(card.title)}</h3>
+                  <h3 style="font-size: 1.25rem;">${this.escapeHtml(card.title)}</h3>
                 </div>
                 <div style="text-align: center; font-size: 0.8rem; color: var(--text-muted);">
                   (Tap or press Space to reveal New BNS Section &amp; Changes)
                 </div>
               </div>
 
-              <!-- Back Face (Answer) -->
               <div class="card-face back">
                 <div>
                   <span class="badge badge-new" style="margin-bottom: 12px;">Back: New Sanhita</span>
                   <div style="font-family: var(--font-mono); font-size: 1.8rem; font-weight: 700; color: var(--accent);">
-                    BNS Section ${this.escapeHtml(card.bns)}
+                    ${this.formatSections(card.bns, 'BNS')}
                   </div>
                 </div>
                 <div style="margin: 16px 0;">
@@ -1407,7 +1406,6 @@ export const ui = {
             </div>
           </div>
 
-          <!-- Controls -->
           <div style="display: flex; justify-content: center; gap: 16px; margin-top: 24px;">
             <button id="flashcard-wrong-btn" class="btn btn-outline" style="color: #C62828; border-color: #FECACA;">
               ✘ Need Practice (Drop to Box 1)
@@ -1467,8 +1465,6 @@ export const ui = {
   // -------------------------------------------------------------
   renderWhatsNew() {
     document.title = "What's New in Bharatiya Nyaya Sanhita — BNS Mapper";
-    const all = searchEngine.getAllSectionsCombined();
-    const newProvisions = all.filter(s => s.change === 'new' || s.change === 'modified' || s.explanation.includes('community service'));
 
     this.appContainer.innerHTML = `
       <section class="detail-view" aria-labelledby="whats-new-title">
@@ -1479,54 +1475,52 @@ export const ui = {
 
         <div style="display: flex; flex-direction: column; gap: 20px;">
           <div class="detail-header-card">
-            <span class="badge badge-new" style="margin-bottom: 12px;">Brand New Offence</span>
+            <span class="badge badge-modified" style="margin-bottom: 12px;">Sentencing Reform &bull; Chapter II</span>
+            <h3 style="font-size: 1.4rem; margin-bottom: 8px;">
+              <a href="#/section/bns-4">Section 4 BNS &mdash; Community Service as Statutory Punishment</a>
+            </h3>
+            <p style="margin-bottom: 12px;">
+              For the first time in Indian statutory penal law, Community Service is established as an independent form of punishment under Section 4(f). It provides magistrates with non-custodial reformative alternatives for petty theft under ₹5,000, defamation, and public intoxication.
+            </p>
+          </div>
+
+          <div class="detail-header-card">
+            <span class="badge badge-merged" style="margin-bottom: 12px;">Cyber Jurisdiction &bull; Chapter I</span>
+            <h3 style="font-size: 1.4rem; margin-bottom: 8px;">
+              <a href="#/section/bns-1">Section 1(5)(c) BNS &mdash; Express Extraterritorial Cyber Jurisdiction</a>
+            </h3>
+            <p style="margin-bottom: 12px;">
+              Section 1 expressly incorporates extraterritorial jurisdiction over any individual, Indian or foreign national, who targets computer systems or resources situated in India from anywhere in the world.
+            </p>
+          </div>
+
+          <div class="detail-header-card">
+            <span class="badge badge-new" style="margin-bottom: 12px;">Street Crime &bull; Chapter XVII</span>
             <h3 style="font-size: 1.4rem; margin-bottom: 8px;">
               <a href="#/section/bns-304">Section 304 BNS &mdash; Snatching</a>
             </h3>
             <p style="margin-bottom: 12px;">
               IPC had no dedicated offence for street snatching of phones, purses, and gold chains; police had to choose between simple theft or violent robbery. BNS 304 creates an express category for sudden/forcible seizing.
             </p>
-            <div class="punishment-box">
-              <span class="punishment-tag">Punishment:</span>
-              <span class="punishment-text">Imprisonment up to 3 years and fine.</span>
-            </div>
           </div>
 
           <div class="detail-header-card">
-            <span class="badge badge-new" style="margin-bottom: 12px;">Brand New Provision</span>
+            <span class="badge badge-new" style="margin-bottom: 12px;">Hate Crime &bull; Chapter VI</span>
             <h3 style="font-size: 1.4rem; margin-bottom: 8px;">
               <a href="#/section/bns-103-2">Section 103(2) BNS &mdash; Mob Lynching / Group Hate Murder</a>
             </h3>
             <p style="margin-bottom: 12px;">
-              Expressly codifies group murder committed by five or more persons on grounds of race, caste, community, sex, place of birth, language, or personal belief.
+              Expressly codifies group murder committed by five or more persons on grounds of race, caste, community, sex, place of birth, language, or personal belief, prescribing death or life imprisonment.
             </p>
-            <div class="punishment-box">
-              <span class="punishment-tag">Punishment:</span>
-              <span class="punishment-text">Capital punishment (Death) or Life Imprisonment, and fine.</span>
-            </div>
           </div>
 
           <div class="detail-header-card">
-            <span class="badge badge-new" style="margin-bottom: 12px;">Brand New Provision</span>
+            <span class="badge badge-new" style="margin-bottom: 12px;">Syndicate Crime &bull; Chapter VI</span>
             <h3 style="font-size: 1.4rem; margin-bottom: 8px;">
               <a href="#/section/bns-111">Section 111 BNS &mdash; Organised Crime</a>
             </h3>
             <p style="margin-bottom: 12px;">
               Establishes a unified central penal code offence for criminal syndicates, contract killings, kidnapping rackets, and land grabbing, ending sole reliance on state laws like MCOCA.
-            </p>
-            <div class="punishment-box">
-              <span class="punishment-tag">Punishment:</span>
-              <span class="punishment-text">Death or life imprisonment if death ensues; otherwise 5 years to life, minimum ₹5 lakh fine.</span>
-            </div>
-          </div>
-
-          <div class="detail-header-card">
-            <span class="badge badge-modified" style="margin-bottom: 12px;">Sentencing Reform</span>
-            <h3 style="font-size: 1.4rem; margin-bottom: 8px;">
-              <a href="#/section/ipc-379">Community Service as Alternative Sentence</a>
-            </h3>
-            <p style="margin-bottom: 12px;">
-              For first-time petty theft under ₹5,000 (Section 303(2)) and defamation (Section 356(2)), judges can now award reformative community service instead of jail time.
             </p>
           </div>
         </div>
@@ -1570,8 +1564,8 @@ export const ui = {
               <div class="compare-col">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                   <div>
-                    <div style="font-family: var(--font-mono); font-size: 1.3rem; font-weight: 700; color: var(--accent);">
-                      § ${sec.ipc} &rarr; § ${sec.bns}
+                    <div style="font-family: var(--font-mono); font-size: 1.15rem; font-weight: 700; color: var(--accent);">
+                      ${this.formatSections(sec.ipc, 'IPC')} &rarr; ${this.formatSections(sec.bns, 'BNS')}
                     </div>
                     ${this.getBadgeHtml(sec.change)}
                   </div>

@@ -1,0 +1,182 @@
+[
+  {
+    "chapter": "I",
+    "title": "Preliminary",
+    "range": "1-3",
+    "start": 1,
+    "end": 3,
+    "file": "chI.json",
+    "sections_count": 3
+  },
+  {
+    "chapter": "II",
+    "title": "Of Punishments",
+    "range": "4-13",
+    "start": 4,
+    "end": 13,
+    "file": "chII.json",
+    "sections_count": 10
+  },
+  {
+    "chapter": "III",
+    "title": "General Exceptions",
+    "range": "14-44",
+    "start": 14,
+    "end": 44,
+    "file": "chIII.json",
+    "sections_count": 31
+  },
+  {
+    "chapter": "IV",
+    "title": "Of Abetment, Criminal Conspiracy and Attempt",
+    "range": "45-62",
+    "start": 45,
+    "end": 62,
+    "file": "chIV.json",
+    "sections_count": 18
+  },
+  {
+    "chapter": "V",
+    "title": "Of Offences Against Woman and Child",
+    "range": "63-99",
+    "start": 63,
+    "end": 99,
+    "file": "chV.json",
+    "sections_count": 37
+  },
+  {
+    "chapter": "VI",
+    "title": "Of Offences Affecting the Human Body",
+    "range": "100-146",
+    "start": 100,
+    "end": 146,
+    "file": "chVI.json",
+    "sections_count": 47
+  },
+  {
+    "chapter": "VII",
+    "title": "Of Offences Against the State",
+    "range": "147-158",
+    "start": 147,
+    "end": 158,
+    "file": "chVII.json",
+    "sections_count": 12
+  },
+  {
+    "chapter": "VIII",
+    "title": "Of Offences Relating to the Army, Navy and Air Force",
+    "range": "159-168",
+    "start": 159,
+    "end": 168,
+    "file": "chVIII.json",
+    "sections_count": 10
+  },
+  {
+    "chapter": "IX",
+    "title": "Of Offences Relating to Elections",
+    "range": "169-177",
+    "start": 169,
+    "end": 177,
+    "file": "chIX.json",
+    "sections_count": 9
+  },
+  {
+    "chapter": "X",
+    "title": "Of Offences Relating to Coin, Currency-Notes, Bank-Notes, and Government Stamps",
+    "range": "178-188",
+    "start": 178,
+    "end": 188,
+    "file": "chX.json",
+    "sections_count": 11
+  },
+  {
+    "chapter": "XI",
+    "title": "Of Offences Against the Public Tranquillity",
+    "range": "189-197",
+    "start": 189,
+    "end": 197,
+    "file": "chXI.json",
+    "sections_count": 9
+  },
+  {
+    "chapter": "XII",
+    "title": "Of Offences by or Relating to Public Servants",
+    "range": "198-205",
+    "start": 198,
+    "end": 205,
+    "file": "chXII.json",
+    "sections_count": 8
+  },
+  {
+    "chapter": "XIII",
+    "title": "Of Contempts of the Lawful Authority of Public Servants",
+    "range": "206-226",
+    "start": 206,
+    "end": 226,
+    "file": "chXIII.json",
+    "sections_count": 21
+  },
+  {
+    "chapter": "XIV",
+    "title": "Of False Evidence and Offences Against Public Justice",
+    "range": "227-269",
+    "start": 227,
+    "end": 269,
+    "file": "chXIV.json",
+    "sections_count": 43
+  },
+  {
+    "chapter": "XV",
+    "title": "Of Offences Affecting the Public Health, Safety, Convenience, Decency and Morals",
+    "range": "270-297",
+    "start": 270,
+    "end": 297,
+    "file": "chXV.json",
+    "sections_count": 28
+  },
+  {
+    "chapter": "XVI",
+    "title": "Of Offences Relating to Religion",
+    "range": "298-302",
+    "start": 298,
+    "end": 302,
+    "file": "chXVI.json",
+    "sections_count": 5
+  },
+  {
+    "chapter": "XVII",
+    "title": "Of Offences Against Property",
+    "range": "303-334",
+    "start": 303,
+    "end": 334,
+    "file": "chXVII.json",
+    "sections_count": 32
+  },
+  {
+    "chapter": "XVIII",
+    "title": "Of Offences Relating to Documents and to Property Marks",
+    "range": "335-350",
+    "start": 335,
+    "end": 350,
+    "file": "chXVIII.json",
+    "sections_count": 16
+  },
+  {
+    "chapter": "XIX",
+    "title": "Of Criminal Intimidation, Insult, Annoyance, Defamation, etc.",
+    "range": "351-357",
+    "start": 351,
+    "end": 357,
+    "file": "chXIX.json",
+    "sections_count": 7
+  },
+  {
+    "chapter": "XX",
+    "title": "Repeal and Savings",
+    "range": "358",
+    "start": 358,
+    "end": 358,
+    "file": "chXX.json",
+    "sections_count": 1
+  }
+]

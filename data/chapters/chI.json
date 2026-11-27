@@ -1,0 +1,50 @@
+[
+  {
+    "id": "bns-1",
+    "bns": ["1"],
+    "ipc": ["1", "2", "3", "4", "5"],
+    "title": "Short Title, Commencement and Application",
+    "chapter": "I",
+    "change": "merged",
+    "old_text": "IPC Sections 1 to 5 defined the title, extent across India, punishment of offences committed within or beyond India, extraterritorial operation, and savings for certain local/special laws.",
+    "new_text": "This Act may be called the Bharatiya Nyaya Sanhita, 2023. It applies to every person within India and extraterritorially to Indian citizens abroad, ships/aircraft registered in India, and computer targets in India, saving certain military and special laws.",
+    "punishment_old": "General jurisdictional application rules.",
+    "punishment_new": "General jurisdictional application rules, explicitly covering cyber attacks on Indian computer resources.",
+    "explanation": "Section 1 consolidates IPC Sections 1 to 5 into a single comprehensive title and territorial jurisdiction clause. It expressly codifies extraterritorial jurisdiction over cyber offences targeting Indian computer resources.",
+    "tags": ["jurisdiction", "commencement", "extraterritorial", "cyber offences", "application"],
+    "verified": false,
+    "source": "Bharatiya Nyaya Sanhita, 2023, Section 1"
+  },
+  {
+    "id": "bns-2",
+    "bns": ["2"],
+    "ipc": ["6", "7", "8", "9", "10", "11", "12", "14", "17", "18", "19", "21", "22", "23", "24", "25", "26", "28", "29", "29A", "30"],
+    "title": "Definitions",
+    "chapter": "I",
+    "change": "merged",
+    "old_text": "Scattered definitions across IPC Sections 6 to 30 (act, person, gender, public servant, movable property, electronic record, valuable security, etc.).",
+    "new_text": "Consolidates 39 core definitions in alphabetical order, including act, child, court, document, electronic record, gender, good faith, government, injury, judge, public servant, and valuable security.",
+    "punishment_old": "Definitional clauses.",
+    "punishment_new": "Consolidated single interpretation section.",
+    "explanation": "BNS Section 2 unifies dozens of previously scattered IPC definition sections into a single alphabetical section. It modernizes terms like 'document' and 'electronic record' and defines 'child' consistently.",
+    "tags": ["definitions", "interpretation", "public servant", "document", "electronic record"],
+    "verified": false,
+    "source": "Bharatiya Nyaya Sanhita, 2023, Section 2"
+  },
+  {
+    "id": "bns-3",
+    "bns": ["3"],
+    "ipc": ["32", "33", "34", "35", "36", "37", "38"],
+    "title": "General Explanations and Common Intention",
+    "chapter": "I",
+    "change": "merged",
+    "old_text": "IPC Sections 32-38 governed acts done by several persons, omissions, and common intention (Section 34).",
+    "new_text": "Section 3 sets out general interpretive principles. Sub-section (5) retains the classic rule that when a criminal act is done by several persons in furtherance of common intention, each is liable as if done by him alone.",
+    "punishment_old": "Joint constructive criminal liability (IPC 34).",
+    "punishment_new": "Constructive joint criminal liability retained under sub-section 3(5).",
+    "explanation": "The famed common intention principle of IPC Section 34 is now placed in Section 3(5). Subsections (1) to (9) integrate principles of joint liability, omissions, and cooperative criminal acts.",
+    "tags": ["common intention", "joint liability", "group liability", "omission", "constructive liability"],
+    "verified": false,
+    "source": "Bharatiya Nyaya Sanhita, 2023, Section 3"
+  }
+]

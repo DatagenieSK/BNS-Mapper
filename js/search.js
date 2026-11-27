@@ -1,6 +1,7 @@
 /**
  * Search module for BNS Mapper
- * Powered by Fuse.js with direction-aware weighting and multi-statute support
+ * Supports array-based section mappings (e.g. IPC [300, 302] -> BNS [103]),
+ * lazy Fuse.js indexing, and multi-statute datasets.
  */
 
 import { DIRECTIONS, STATUTES } from './storage.js';
@@ -21,13 +22,13 @@ export const searchEngine = {
     datasets[STATUTES.IEA_BSA] = bsaSections || [];
     currentDirection = direction;
     currentStatute = statute;
-    this.rebuildIndex();
+    fuseInstance = null; // Mark index as dirty for lazy building
   },
 
   setStatute(statute) {
     if (datasets[statute]) {
       currentStatute = statute;
-      this.rebuildIndex();
+      fuseInstance = null; // Reset index for lazy rebuild
     }
   },
 
@@ -38,8 +39,15 @@ export const searchEngine = {
   setDirection(direction) {
     if (currentDirection !== direction) {
       currentDirection = direction;
+      fuseInstance = null; // Reset index for lazy rebuild
+    }
+  },
+
+  getFuseInstance() {
+    if (!fuseInstance) {
       this.rebuildIndex();
     }
+    return fuseInstance;
   },
 
   rebuildIndex() {
@@ -89,17 +97,29 @@ export const searchEngine = {
       const secondaryKey = currentDirection === DIRECTIONS.BNS_TO_IPC ? 'ipc' : 'bns';
 
       for (const item of activeList) {
-        const pVal = (item[primaryKey] || '').toLowerCase().replace(/[^0-9a-zA-Z()]/g, '');
-        const sVal = (item[secondaryKey] || '').toLowerCase().replace(/[^0-9a-zA-Z()]/g, '');
+        const pArr = Array.isArray(item[primaryKey]) ? item[primaryKey] : [item[primaryKey]];
+        const sArr = Array.isArray(item[secondaryKey]) ? item[secondaryKey] : [item[secondaryKey]];
 
-        if (pVal === cleanNum || pVal.startsWith(cleanNum)) {
+        const pMatch = pArr.some(num => {
+          const c = String(num || '').toLowerCase().replace(/[^0-9a-zA-Z()]/g, '');
+          return c === cleanNum || c.startsWith(cleanNum);
+        });
+
+        const sMatch = sArr.some(num => {
+          const c = String(num || '').toLowerCase().replace(/[^0-9a-zA-Z()]/g, '');
+          return c === cleanNum || c.startsWith(cleanNum);
+        });
+
+        if (pMatch) {
           directMatches.push({ item, score: 0 });
-        } else if (sVal === cleanNum || sVal.startsWith(cleanNum)) {
+        } else if (sMatch) {
           directMatches.push({ item, score: 0.05 });
         }
       }
 
-      const fuseResults = fuseInstance ? fuseInstance.search(trimmed) : [];
+      // Lazy query through Fuse instance
+      const fuse = this.getFuseInstance();
+      const fuseResults = fuse ? fuse.search(trimmed) : [];
       const seenIds = new Set();
       results = [];
 
@@ -146,13 +166,22 @@ export const searchEngine = {
     const clean = idOrNumber.toString().trim().toLowerCase();
     const combined = this.getAllSectionsCombined();
 
+    // 1. Direct ID match
     let found = combined.find(s => s.id.toLowerCase() === clean);
     if (found) return found;
 
-    found = combined.find(s => s.ipc.toLowerCase() === clean);
+    // 2. Direct Section match in bns array
+    found = combined.find(s => {
+      const arr = Array.isArray(s.bns) ? s.bns : [s.bns];
+      return arr.some(num => String(num).toLowerCase() === clean || String(num).toLowerCase().startsWith(clean));
+    });
     if (found) return found;
 
-    found = combined.find(s => s.bns.toLowerCase() === clean || s.bns.toLowerCase().startsWith(clean));
+    // 3. Direct Section match in ipc array
+    found = combined.find(s => {
+      const arr = Array.isArray(s.ipc) ? s.ipc : [s.ipc];
+      return arr.some(num => String(num).toLowerCase() === clean || String(num).toLowerCase().startsWith(clean));
+    });
     if (found) return found;
 
     return null;

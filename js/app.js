@@ -1,6 +1,7 @@
 /**
- * Application Bootstrap for BNS Mapper (Extended Round 2)
- * Loads multi-statute datasets, initializes quiz engine, PWA service worker, and routing
+ * Application Bootstrap for BNS Mapper (Round 1 Upgrade)
+ * Loads data/chapters.json, fetches and merges all chapter datasets dynamically,
+ * registers service worker with chapter caching, and initializes routing.
  */
 
 import { storage, DIRECTIONS, STATUTES } from './storage.js';
@@ -12,36 +13,64 @@ import { ui } from './ui.js';
 let appRouter = null;
 
 async function bootstrap() {
-  // 1. Initialize Theme from storage or system preferences
   storage.initTheme();
 
-  // 2. Setup UI Container
   const container = document.getElementById('app');
   ui.init(container);
 
-  // 3. Register Service Worker for PWA Offline Support
+  // Register Service Worker for PWA Offline Support
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js').then((reg) => {
         console.log('BNS Mapper Service Worker registered:', reg.scope);
       }).catch((err) => {
-        console.warn('Service Worker registration skipped/failed:', err);
+        console.warn('Service Worker registration skipped:', err);
       });
     });
   }
 
-  // 4. Fetch all datasets via relative paths
-  let ipcSections = [], bnssSections = [], bsaSections = [], quizScenarios = [];
+  // Fetch Chapters index and merge chapter files
+  let ipcSections = [];
+  let chaptersIndex = [];
+  let bnssSections = [], bsaSections = [], quizScenarios = [];
+
   try {
-    const [ipcRes, bnssRes, bsaRes, scenRes] = await Promise.all([
-      fetch('./data/sections.json'),
+    const [chaptersRes, bnssRes, bsaRes, scenRes] = await Promise.all([
+      fetch('./data/chapters.json'),
       fetch('./data/bnss_sections.json').catch(() => ({ ok: false })),
       fetch('./data/bsa_sections.json').catch(() => ({ ok: false })),
       fetch('./data/quiz_scenarios.json').catch(() => ({ ok: false }))
     ]);
 
-    if (!ipcRes.ok) throw new Error(`HTTP ${ipcRes.status} loading sections.json`);
-    ipcSections = await ipcRes.json();
+    if (chaptersRes.ok) {
+      chaptersIndex = await chaptersRes.json();
+      ui.setChaptersIndex(chaptersIndex);
+
+      // Fetch each chapter file listed in chapters.json in parallel
+      const chapterFetches = chaptersIndex.map(ch =>
+        fetch(`./data/chapters/${ch.file}`)
+          .then(r => r.ok ? r.json() : [])
+          .catch(() => [])
+      );
+
+      const chapterResults = await Promise.all(chapterFetches);
+      ipcSections = chapterResults.flat();
+    }
+
+    // Fallback if chapter files are not yet fully available
+    if (!ipcSections || ipcSections.length === 0) {
+      const fallbackRes = await fetch('./data/sections.json');
+      if (fallbackRes.ok) {
+        const raw = await fallbackRes.json();
+        // Normalize any old single string format to array
+        ipcSections = raw.map(s => ({
+          ...s,
+          bns: Array.isArray(s.bns) ? s.bns : [s.bns],
+          ipc: Array.isArray(s.ipc) ? s.ipc : [s.ipc]
+        }));
+      }
+    }
+
     if (bnssRes.ok) bnssSections = await bnssRes.json();
     if (bsaRes.ok) bsaSections = await bsaRes.json();
     if (scenRes.ok) quizScenarios = await scenRes.json();
@@ -56,13 +85,13 @@ async function bootstrap() {
     return;
   }
 
-  // 5. Initialize Search & Quiz Engines
+  // Initialize Search & Quiz Engines
   const currentDirection = storage.getDirection();
   const currentStatute = storage.getActiveStatute();
   searchEngine.init(ipcSections, bnssSections, bsaSections, currentDirection, currentStatute);
   quizEngine.init(searchEngine.getAllSectionsCombined(), quizScenarios);
 
-  // 6. Setup Router with Extended Routes
+  // Setup Router
   appRouter = new Router();
 
   appRouter
@@ -94,15 +123,11 @@ async function bootstrap() {
       ui.renderCompareView();
     });
 
-  // 7. Bind Global Header Controls (Statute Switcher, Direction Switcher, Theme Toggle)
   bindGlobalControls();
-
-  // 8. Initial routing handle
   appRouter.handleRouting();
 }
 
 function bindGlobalControls() {
-  // Theme toggle button
   const themeToggle = document.getElementById('theme-toggle-btn');
   const bottomThemeToggle = document.getElementById('bottom-theme-toggle-btn');
 
@@ -134,7 +159,7 @@ function bindGlobalControls() {
   }
   updateThemeIcon();
 
-  // Statute Switcher Tabs (IPC/BNS vs CrPC/BNSS vs IEA/BSA)
+  // Statute Switcher Tabs
   const statuteBtns = document.querySelectorAll('.statute-tab-btn');
   const updateStatuteUI = (activeStatute) => {
     statuteBtns.forEach(b => {
@@ -172,7 +197,7 @@ function bindGlobalControls() {
     });
   });
 
-  // Direction Switcher (IPC -> BNS vs BNS -> IPC)
+  // Direction Switcher
   const dirBtns = document.querySelectorAll('.direction-btn');
   const updateDirectionUI = (activeDir) => {
     dirBtns.forEach(b => {
@@ -208,7 +233,7 @@ function bindGlobalControls() {
     });
   });
 
-  // Global Keyboard Shortcuts
+  // Keyboard Shortcuts
   window.addEventListener('keydown', (e) => {
     if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
       e.preventDefault();
@@ -239,5 +264,4 @@ function bindGlobalControls() {
   });
 }
 
-// Launch
 bootstrap();

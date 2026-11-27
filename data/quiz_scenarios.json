@@ -318,5 +318,140 @@
     "ipc_section": "304A",
     "explanation": "BNS Section 106(2) creates a dedicated aggravated hit-and-run offence carrying imprisonment up to 10 years and fine for escaping after causing death.",
     "chapter": "Offences Affecting the Human Body"
+  },
+  {
+    "id": "scen-ch1-01",
+    "section": "bns-1",
+    "chapter": "I",
+    "scenario": "A foreign national located in Dubai hacks into a financial server located in Mumbai, corrupting banking records. When questioned on jurisdiction, the prosecutor invokes BNS Section 1. Does the BNS apply to this cyber offence committed outside India?",
+    "options": [
+      "No, BNS only applies within India's physical land borders",
+      "Yes, Section 1(5)(c) expressly applies to any person targeting computer resources located in India",
+      "Only if the offender is an Indian citizen holding an Indian passport",
+      "No, only the Information Technology Act can apply"
+    ],
+    "answer": "Yes, Section 1(5)(c) expressly applies to any person targeting computer resources located in India",
+    "correctIndex": 1,
+    "explanation": "BNS Section 1(5)(c) explicitly extends extraterritorial jurisdiction to any person in any place without and beyond India committing any offence targeting a computer resource located in India."
+  },
+  {
+    "id": "scen-ch1-02",
+    "section": "bns-2",
+    "chapter": "I",
+    "scenario": "In a criminal trial involving digital evidence, the defence argues that an encrypted instant message chat does not qualify as a 'document' under the penal law. How does BNS Section 2 resolve this?",
+    "options": [
+      "Digital records are not considered documents under criminal law",
+      "Section 2(8) consolidates definitions and explicitly includes electronic and digital records as documents",
+      "Only paper documents with physical wax seals qualify",
+      "Only messages sent via government postal services qualify"
+    ],
+    "answer": "Section 2(8) consolidates definitions and explicitly includes electronic and digital records as documents",
+    "correctIndex": 1,
+    "explanation": "BNS Section 2(8) defines 'document' to expressly include electronic and digital records, emails, server logs, and messages stored on digital devices."
+  },
+  {
+    "id": "scen-ch1-03",
+    "section": "bns-3",
+    "chapter": "I",
+    "scenario": "Four individuals plan a warehouse robbery. Two break open the gates while the other two stand guard outside with weapons. One guard shoots a night watchman. Where is the principle of joint constructive liability codified in BNS?",
+    "options": [
+      "BNS Section 3(5)",
+      "BNS Section 103",
+      "BNS Section 303",
+      "BNS Section 358"
+    ],
+    "answer": "BNS Section 3(5)",
+    "correctIndex": 0,
+    "explanation": "The principle of common intention (formerly IPC Section 34) is now codified under BNS Section 3(5), holding each participant liable for acts done in furtherance of the common intention."
+  },
+  {
+    "id": "scen-ch2-01",
+    "section": "bns-4",
+    "chapter": "II",
+    "scenario": "A judicial magistrate convicts a first-time offender for an altercation involving minor public misconduct. Wishing to avoid sending the youth to jail, the magistrate sentences him to clean a public park for 10 hours. Under which section of BNS is this penalty recognized?",
+    "options": [
+      "BNS Section 4, which adds 'Community service' as a statutory punishment",
+      "BNS Section 11, under solitary confinement",
+      "BNS Section 6, under fractional imprisonment",
+      "Magistrates have no power to award community service"
+    ],
+    "answer": "BNS Section 4, which adds 'Community service' as a statutory punishment",
+    "correctIndex": 0,
+    "explanation": "BNS Section 4 introduces 'Community service' as the sixth formal statutory category of punishment alongside death, imprisonment for life, imprisonment, forfeiture, and fine."
+  },
+  {
+    "id": "scen-ch2-02",
+    "section": "bns-6",
+    "chapter": "II",
+    "scenario": "A court is calculating the fractional sentence for an attempt to commit an offence punishable with life imprisonment. Under BNS Section 6, how many years is imprisonment for life reckoned as for fraction calculations?",
+    "options": [
+      "10 years",
+      "14 years",
+      "20 years",
+      "25 years"
+    ],
+    "answer": "20 years",
+    "correctIndex": 2,
+    "explanation": "BNS Section 6 (formerly IPC Section 57) provides that in calculating fractions of terms of punishment, imprisonment for life shall be reckoned as equivalent to imprisonment for twenty years."
+  },
+  {
+    "id": "scen-ch2-03",
+    "section": "bns-8",
+    "chapter": "II",
+    "scenario": "An accused is convicted of an offence carrying a maximum prison term of 4 years and fine. The magistrate sentences him to 1 year imprisonment and a fine of ₹10,000, with default imprisonment of 2 years if unpaid. Is this default sentence lawful under BNS Section 8?",
+    "options": [
+      "Yes, default imprisonment can be of any length at the magistrate's discretion",
+      "No, under Section 8(3), default imprisonment cannot exceed one-fourth of the maximum term (1 year max)",
+      "Yes, provided it does not exceed 3 years",
+      "No, fine defaults can only be punished with community service"
+    ],
+    "answer": "No, under Section 8(3), default imprisonment cannot exceed one-fourth of the maximum term (1 year max)",
+    "correctIndex": 1,
+    "explanation": "Under BNS Section 8(3) (formerly IPC 65), the term of imprisonment in default of payment of fine shall not exceed one-fourth of the maximum term of imprisonment fixed for the offence."
+  },
+  {
+    "id": "scen-ch3-01",
+    "section": "bns-20",
+    "chapter": "III",
+    "scenario": "A 6-year-old child picks up a gold coin from a neighbour's table and puts it into his pocket. The neighbour seeks to lodge a police complaint for theft under Section 303 BNS. What statutory defence applies?",
+    "options": [
+      "BNS Section 20: absolute immunity under 7 years of age (doli incapax)",
+      "BNS Section 24: voluntary intoxication",
+      "BNS Section 33: slight harm",
+      "No defence; the child must be tried in juvenile court"
+    ],
+    "answer": "BNS Section 20: absolute immunity under 7 years of age (doli incapax)",
+    "correctIndex": 0,
+    "explanation": "BNS Section 20 (formerly IPC Section 82) provides that nothing is an offence which is done by a child under seven years of age (doli incapax)."
+  },
+  {
+    "id": "scen-ch3-02",
+    "section": "bns-30",
+    "chapter": "III",
+    "scenario": "An unconscious accident victim with severe internal bleeding is rushed to the hospital. A surgeon performs an immediate emergency laparotomy to save the victim's life without waiting for relatives' consent. Which section of BNS protects the surgeon from criminal liability?",
+    "options": [
+      "BNS Section 14",
+      "BNS Section 30 (act done in good faith for person's benefit without consent in emergency)",
+      "BNS Section 37",
+      "BNS Section 44"
+    ],
+    "answer": "BNS Section 30 (act done in good faith for person's benefit without consent in emergency)",
+    "correctIndex": 1,
+    "explanation": "BNS Section 30 (formerly IPC Section 92) provides that nothing is an offence done in good faith for the benefit of a person even without consent when obtaining consent is impossible in an emergency."
+  },
+  {
+    "id": "scen-ch3-03",
+    "section": "bns-41",
+    "chapter": "III",
+    "scenario": "At 2:00 AM, a homeowner wakes up to find an armed intruder breaking through the bedroom window carrying a sharp machete and threatening to kill anyone who moves. The homeowner shoots the intruder, causing death. Which section justifies this act?",
+    "options": [
+      "BNS Section 41 (right of private defence of property against night house-breaking extends to causing death)",
+      "BNS Section 22",
+      "BNS Section 15",
+      "BNS Section 8"
+    ],
+    "answer": "BNS Section 41 (right of private defence of property against night house-breaking extends to causing death)",
+    "correctIndex": 0,
+    "explanation": "Under BNS Section 41 (formerly IPC Section 103), the right of private defence of property extends to voluntary causing of death in cases of house-breaking by night or robbery."
   }
 ]

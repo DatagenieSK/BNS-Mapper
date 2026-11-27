@@ -1,14 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "BNSMapperSectionList",
-  "description": "Schema for IPC to BNS sections mapping dataset",
+  "title": "BNSMapperChapterSectionList",
+  "description": "Schema for IPC to BNS sections mapping dataset per chapter",
   "type": "array",
   "items": {
     "type": "object",
     "required": [
       "id",
-      "ipc",
       "bns",
+      "ipc",
       "title",
       "chapter",
       "change",
@@ -24,26 +24,35 @@
     "properties": {
       "id": {
         "type": "string",
-        "pattern": "^(ipc|bns)-[a-zA-Z0-9_-]+$",
-        "description": "Unique identifier for the mapping, e.g. ipc-302"
-      },
-      "ipc": {
-        "type": "string",
-        "description": "IPC section number, or 'Omitted' / 'None' if brand new in BNS"
+        "pattern": "^(ipc|bns)-[a-zA-Z0-9_().-]+$",
+        "description": "Unique identifier for the mapping, e.g. bns-103"
       },
       "bns": {
-        "type": "string",
-        "description": "BNS section number, or 'Omitted' if removed in BNS"
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Array of BNS section numbers, or ['Omitted'] if omitted"
+      },
+      "ipc": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Array of corresponding IPC section numbers, or ['None'] if brand new"
       },
       "title": {
         "type": "string",
         "minLength": 2,
-        "description": "Subject title of the offence or provision"
+        "description": "Subject title of the provision"
       },
       "chapter": {
         "type": "string",
-        "minLength": 2,
-        "description": "Legal chapter or category (e.g. Offences Affecting the Human Body)"
+        "enum": [
+          "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X",
+          "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX"
+        ],
+        "description": "BNS Chapter Roman numeral (I to XX)"
       },
       "change": {
         "type": "string",
@@ -52,38 +61,38 @@
       },
       "old_text": {
         "type": "string",
-        "description": "Verbatim or key extract from the Indian Penal Code, 1860"
+        "description": "Operative summary of previous IPC provision"
       },
       "new_text": {
         "type": "string",
-        "description": "Verbatim or key extract from the Bharatiya Nyaya Sanhita, 2023"
+        "description": "Operative summary of new BNS provision"
       },
       "punishment_old": {
         "type": "string",
-        "description": "Prescribed punishment under IPC"
+        "description": "Punishment under IPC"
       },
       "punishment_new": {
         "type": "string",
-        "description": "Prescribed punishment under BNS"
+        "description": "Punishment under BNS"
       },
       "explanation": {
         "type": "string",
-        "description": "Plain-English explanation of the change and practical implications"
+        "description": "Plain English summary, 2-3 sentences"
       },
       "tags": {
         "type": "array",
         "items": {
           "type": "string"
         },
-        "description": "Keywords, aliases, and search tags"
+        "description": "Keywords and search tags"
       },
       "verified": {
         "type": "boolean",
-        "description": "Whether the entry has been verified against the official gazette"
+        "description": "Manual verification flag"
       },
       "source": {
         "type": "string",
-        "description": "Official gazette citation, parliamentary report, or authoritative reference"
+        "description": "Official Gazette citation"
       }
     },
     "additionalProperties": false
